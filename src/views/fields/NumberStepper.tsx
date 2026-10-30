@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks'
 import { clampToField, parseWholeNumber } from '../../model/numberField.ts'
 import type { NumberField } from '../../model/schema.ts'
+import { useRepeatPress } from './useRepeatPress.ts'
 
 type Props = {
   field: NumberField
@@ -31,17 +32,25 @@ export function NumberStepper({ field, label, value, onChange }: Props) {
   const step = (delta: number) => {
     // Not every browser blurs the input when a button is tapped, so drop the draft here too
     setDraft(null)
-    onChange(clampToField(value + delta, field))
+    const newValue = clampToField(value + delta, field)
+    const changed = newValue !== value
+    if (!changed) return false
+
+    onChange(newValue)
+    return true // Return true if the value changed, so the repeat press can continue
   }
+
+  const decrease = useRepeatPress(() => step(-1))
+  const increase = useRepeatPress(() => step(1))
 
   return (
     <div class="stepper">
       <button
+        {...decrease}
         type="button"
         class="stepper-button"
         aria-label={`${label} verringern`}
         disabled={field.min !== undefined && value <= field.min}
-        onClick={() => step(-1)}
       >
         −
       </button>
@@ -63,11 +72,11 @@ export function NumberStepper({ field, label, value, onChange }: Props) {
         }}
       />
       <button
+        {...increase}
         type="button"
         class="stepper-button"
         aria-label={`${label} erhöhen`}
         disabled={field.max !== undefined && value >= field.max}
-        onClick={() => step(1)}
       >
         +
       </button>
