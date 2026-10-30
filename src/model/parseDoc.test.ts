@@ -107,7 +107,9 @@ describe('parseDoc', () => {
       const doc = clone()
       doc.cards[0]!.replies[2]!.template.text = 'Nein, noch {n Haltestellen'
       expect(problemsOf(doc)).toEqual([
-        expect.stringContaining('Reply "noch-haltestellen-nein-anzahl" of card "noch-haltestellen": Unclosed'),
+        expect.stringContaining(
+          'Reply "noch-haltestellen-nein-anzahl" of card "noch-haltestellen": Unclosed',
+        ),
       ])
     })
   })

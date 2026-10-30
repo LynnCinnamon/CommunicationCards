@@ -2,7 +2,10 @@ import * as v from 'valibot'
 
 export const SCHEMA_VERSION = 1
 
-const Id = v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]+$/, 'IDs may only contain letters, digits, "_" and "-"'))
+const Id = v.pipe(
+  v.string(),
+  v.regex(/^[A-Za-z0-9_-]+$/, 'IDs may only contain letters, digits, "_" and "-"'),
+)
 const Name = v.pipe(v.string(), v.trim(), v.nonEmpty())
 
 /** Entries every field type has. The label names the field for the user, e.g. "Haltestelle". */

@@ -13,9 +13,21 @@ export function checkIntegrity(doc: Doc): string[] {
   const listIds = new Set(doc.lists.map((l) => l.id))
   const cardIds = new Set(doc.cards.map((c) => c.id))
 
-  reportDuplicates(doc.lists.map((l) => l.id), 'list', problems)
-  reportDuplicates(doc.sets.map((s) => s.id), 'set', problems)
-  reportDuplicates(doc.cards.map((c) => c.id), 'card', problems)
+  reportDuplicates(
+    doc.lists.map((l) => l.id),
+    'list',
+    problems,
+  )
+  reportDuplicates(
+    doc.sets.map((s) => s.id),
+    'set',
+    problems,
+  )
+  reportDuplicates(
+    doc.cards.map((c) => c.id),
+    'card',
+    problems,
+  )
   reportDuplicates(
     doc.cards.flatMap((c) => c.replies.map((r) => r.id)),
     'reply',
@@ -23,7 +35,11 @@ export function checkIntegrity(doc: Doc): string[] {
   )
 
   for (const list of doc.lists) {
-    reportDuplicates(list.values.map((v) => v.id), `value in list "${list.id}"`, problems)
+    reportDuplicates(
+      list.values.map((v) => v.id),
+      `value in list "${list.id}"`,
+      problems,
+    )
   }
 
   for (const set of doc.sets) {
@@ -42,7 +58,12 @@ export function checkIntegrity(doc: Doc): string[] {
   return problems
 }
 
-function checkTemplate(template: Template, where: string, listIds: Set<string>, problems: string[]) {
+function checkTemplate(
+  template: Template,
+  where: string,
+  listIds: Set<string>,
+  problems: string[],
+) {
   const fieldIds = template.fields.map((f) => f.id)
   reportDuplicates(fieldIds, `field in ${where}`, problems)
 
@@ -54,7 +75,9 @@ function checkTemplate(template: Template, where: string, listIds: Set<string>, 
 
   let placeholders: string[]
   try {
-    placeholders = parseTemplate(template.text).flatMap((s) => (s.kind === 'field' ? [s.fieldId] : []))
+    placeholders = parseTemplate(template.text).flatMap((s) =>
+      s.kind === 'field' ? [s.fieldId] : [],
+    )
   } catch (e) {
     if (e instanceof TemplateSyntaxError) {
       //If we have a TemplateSyntaxError, we can report it as a problem in the doc instead of throwing it
@@ -66,7 +89,8 @@ function checkTemplate(template: Template, where: string, listIds: Set<string>, 
   }
 
   for (const id of placeholders) {
-    if (!fieldIds.includes(id)) problems.push(`${where}: placeholder "{${id}}" has no field definition`)
+    if (!fieldIds.includes(id))
+      problems.push(`${where}: placeholder "{${id}}" has no field definition`)
   }
   for (const id of fieldIds) {
     if (!placeholders.includes(id)) problems.push(`${where}: field "${id}" is not used in the text`)

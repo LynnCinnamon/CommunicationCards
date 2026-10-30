@@ -22,7 +22,9 @@ export async function loadDoc(): Promise<LoadResult> {
   if (raw === undefined) return { status: 'empty' }
 
   const result = parseDoc(raw)
-  return result.ok ? { status: 'ok', doc: result.doc } : { status: 'invalid', problems: result.problems, raw }
+  return result.ok
+    ? { status: 'ok', doc: result.doc }
+    : { status: 'invalid', problems: result.problems, raw }
 }
 
 /** Saves the doc. Refuses inconsistent data so a bug can't corrupt what is stored. */
