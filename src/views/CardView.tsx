@@ -1,11 +1,12 @@
 import type { ComponentChildren } from 'preact'
-import { useState } from 'preact/hooks'
+import { useId, useState } from 'preact/hooks'
 import { initialNumber } from '../model/numberField.ts'
 import type { Card, Doc, Field, List } from '../model/schema.ts'
 import { routeHref } from '../router.ts'
 import { ChoiceButtons } from './fields/ChoiceButtons.tsx'
 import { ChoicePicker } from './fields/ChoicePicker.tsx'
 import { NumberStepper } from './fields/NumberStepper.tsx'
+import { TextInput } from './fields/TextInput.tsx'
 import { TemplateText, fieldName } from './TemplateText.tsx'
 
 /** Number fields hold their number, choice fields the ID of the selected list value. */
@@ -45,6 +46,8 @@ export function CardView({ doc, cardId }: Props) {
 function CardForm({ card, lists }: { card: Card; lists: List[] }) {
   // A function, so the initial values are only computed on the first render
   const [values, setValues] = useState(() => initialValues(card))
+  const idPrefix = useId()
+  const inputId = (field: Field) => `${idPrefix}-${field.id}`
 
   const setValue = (fieldId: string, value: FieldValue) => {
     // A new object instead of changing the old one, otherwise Preact doesn't notice the change
@@ -59,6 +62,13 @@ function CardForm({ card, lists }: { card: Card; lists: List[] }) {
 
   // Choice fields in the sentence open the native picker, a shortcut for long lists
   const renderField = (field: Field, content: ComponentChildren) => {
+    if (field.type === 'text') {
+      return (
+        <label class="text-field-link" for={inputId(field)}>
+          {content}
+        </label>
+      )
+    }
     if (field.type !== 'choice') return content
     const list = lists.find((l) => l.id === field.listId)
     if (!list) return content
@@ -89,6 +99,7 @@ function CardForm({ card, lists }: { card: Card; lists: List[] }) {
         <fieldset key={field.id} class="field">
           <legend>{fieldName(field, lists)}</legend>
           <FieldInput
+            inputId={inputId(field)}
             field={field}
             value={values[field.id]}
             lists={lists}
@@ -101,6 +112,7 @@ function CardForm({ card, lists }: { card: Card; lists: List[] }) {
 }
 
 type FieldInputProps = {
+  inputId: string
   field: Field
   value: FieldValue | undefined
   lists: List[]
@@ -108,7 +120,7 @@ type FieldInputProps = {
 }
 
 /** The input matching the field's type. */
-function FieldInput({ field, value, lists, onChange }: FieldInputProps) {
+function FieldInput({ inputId, field, value, lists, onChange }: FieldInputProps) {
   switch (field.type) {
     case 'choice': {
       // Integrity checks guarantee the list exists; skipping keeps the types honest
@@ -122,6 +134,15 @@ function FieldInput({ field, value, lists, onChange }: FieldInputProps) {
           field={field}
           label={fieldName(field, lists)}
           value={typeof value === 'number' ? value : initialNumber(field)}
+          onChange={onChange}
+        />
+      )
+    case 'text':
+      return (
+        <TextInput
+          id={inputId}
+          label={fieldName(field, lists)}
+          value={typeof value === 'string' ? value : ''}
           onChange={onChange}
         />
       )
@@ -157,6 +178,10 @@ function displayValue(
   switch (field.type) {
     case 'choice':
       return lists.find((l) => l.id === field.listId)?.values.find((v) => v.id === value)?.label
+    case 'text': {
+      const text = typeof value === 'string' ? value.trim() : ''
+      return text === '' ? undefined : text
+    }
     default:
       return String(value)
   }

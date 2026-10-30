@@ -14,7 +14,9 @@ export const exampleDoc: Doc = {
       ],
     },
   ],
-  sets: [{ id: 'oepnv', name: 'ÖPNV', cardIds: ['noch-haltestellen', 'aussteigen'] }],
+  sets: [
+    { id: 'oepnv', name: 'ÖPNV', cardIds: ['noch-haltestellen', 'aussteigen', 'vorstellung'] },
+  ],
   cards: [
     {
       id: 'noch-haltestellen',
@@ -44,6 +46,14 @@ export const exampleDoc: Doc = {
         { id: 'aussteigen-ja', template: { text: 'Ja', fields: [] } },
         { id: 'aussteigen-nein', template: { text: 'Nein', fields: [] } },
       ],
+    },
+    {
+      id: 'vorstellung',
+      template: {
+        text: 'Hallo, ich bin {name}.',
+        fields: [{ id: 'name', label: 'Name', type: 'text' }],
+      },
+      replies: [],
     },
   ],
 }
