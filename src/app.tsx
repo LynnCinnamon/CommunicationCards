@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'preact/hooks'
 import { exampleDoc } from './model/fixtures.ts'
 import type { Doc } from './model/schema.ts'
+import { useRoute } from './router.ts'
 import { loadDoc, saveDoc } from './storage/docStore.ts'
 import { CardListView } from './views/CardListView.tsx'
+import { CardView } from './views/CardView.tsx'
 import { InvalidDataView } from './views/InvalidDataView.tsx'
 
 type AppState =
@@ -27,6 +29,8 @@ async function startUp(): Promise<AppState> {
 
 export function App() {
   const [state, setState] = useState<AppState>({ status: 'loading' })
+  // Hooks must run on every render, so the route is read here and not only in the 'ok' case
+  const route = useRoute()
 
   const showError = (error: unknown) => setState({ status: 'error', message: String(error) })
 
@@ -52,6 +56,10 @@ export function App() {
     case 'invalid':
       return <InvalidDataView problems={state.problems} raw={state.raw} onReset={reset} />
     case 'ok':
-      return <CardListView doc={state.doc} />
+      return route.name === 'card' ? (
+        <CardView doc={state.doc} cardId={route.cardId} />
+      ) : (
+        <CardListView doc={state.doc} />
+      )
   }
 }

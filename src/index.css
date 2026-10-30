@@ -72,3 +72,24 @@ h2 {
   font-weight: 600;
   line-height: 1.4;
 }
+
+a.card-button {
+  text-decoration: none;
+}
+
+.back-button {
+  min-height: 3rem;
+  padding: 0 1rem;
+  font: inherit;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  /* Align the text with the content below despite the padding */
+  margin-left: -1rem;
+}
+
+.card-text {
+  font-size: 1.75rem;
+  line-height: 1.5;
+}
