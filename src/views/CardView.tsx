@@ -1,9 +1,11 @@
 import type { ComponentChildren } from 'preact'
 import { useState } from 'preact/hooks'
+import { initialNumber } from '../model/numberField.ts'
 import type { Card, Doc, Field, List } from '../model/schema.ts'
 import { routeHref } from '../router.ts'
 import { ChoiceButtons } from './fields/ChoiceButtons.tsx'
 import { ChoicePicker } from './fields/ChoicePicker.tsx'
+import { NumberStepper } from './fields/NumberStepper.tsx'
 import { TemplateText, fieldName } from './TemplateText.tsx'
 
 /** Number fields hold their number, choice fields the ID of the selected list value. */
@@ -41,8 +43,8 @@ export function CardView({ doc, cardId }: Props) {
 
 /** The card's sentence as a live preview, with one input per field below it. */
 function CardForm({ card, lists }: { card: Card; lists: List[] }) {
-  // Starts empty: nothing is preselected, so the user can't show a value they never chose
-  const [values, setValues] = useState<Record<string, FieldValue>>({})
+  // A function, so the initial values are only computed on the first render
+  const [values, setValues] = useState(() => initialValues(card))
 
   const setValue = (fieldId: string, value: FieldValue) => {
     // A new object instead of changing the old one, otherwise Preact doesn't notice the change
@@ -114,9 +116,30 @@ function FieldInput({ field, value, lists, onChange }: FieldInputProps) {
       if (!list) return null
       return <ChoiceButtons list={list} selectedId={selectedChoice(value)} onSelect={onChange} />
     }
+    case 'number':
+      return (
+        <NumberStepper
+          field={field}
+          label={fieldName(field, lists)}
+          value={typeof value === 'number' ? value : initialNumber(field)}
+          onChange={onChange}
+        />
+      )
     default:
       return <p class="hint">Dieser Feldtyp kommt später.</p>
   }
+}
+
+/**
+ * Number fields start at their initial number. Choice fields start empty, so the user can't
+ * show a value they never chose.
+ */
+function initialValues(card: Card): Record<string, FieldValue> {
+  const values: Record<string, FieldValue> = {}
+  for (const field of card.template.fields) {
+    if (field.type === 'number') values[field.id] = initialNumber(field)
+  }
+  return values
 }
 
 /** The selected list value's ID; number values can't belong to a choice field. */
