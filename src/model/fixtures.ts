@@ -20,7 +20,7 @@ export const exampleDoc: Doc = {
       id: 'noch-haltestellen',
       template: {
         text: 'Noch {n} Haltestellen?',
-        fields: [{ id: 'n', type: 'number', min: 1, default: 3 }],
+        fields: [{ id: 'n', label: 'Anzahl', type: 'number', min: 1, default: 3 }],
       },
       replies: [
         { id: 'noch-haltestellen-ja', template: { text: 'Ja', fields: [] } },
@@ -29,7 +29,7 @@ export const exampleDoc: Doc = {
           id: 'noch-haltestellen-nein-anzahl',
           template: {
             text: 'Nein, noch {n} Haltestellen',
-            fields: [{ id: 'n', type: 'number', min: 0 }],
+            fields: [{ id: 'n', label: 'Anzahl', type: 'number', min: 0 }],
           },
         },
       ],
@@ -38,7 +38,7 @@ export const exampleDoc: Doc = {
       id: 'aussteigen',
       template: {
         text: 'Steigen wir am {stop} aus?',
-        fields: [{ id: 'stop', type: 'choice', listId: 'haltestellen' }],
+        fields: [{ id: 'stop', label: 'Haltestelle', type: 'choice', listId: 'haltestellen' }],
       },
       replies: [
         { id: 'aussteigen-ja', template: { text: 'Ja', fields: [] } },

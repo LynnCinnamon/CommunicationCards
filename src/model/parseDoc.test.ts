@@ -53,6 +53,18 @@ describe('parseDoc', () => {
       doc.lists[0]!.name = '   '
       expect(problemsOf(doc)).not.toEqual([])
     })
+
+    it('accepts a field without a label', () => {
+      const doc = clone()
+      delete doc.cards[0]!.template.fields[0]!.label
+      expect(problemsOf(doc)).toEqual([])
+    })
+
+    it('rejects a blank field label', () => {
+      const doc = clone()
+      doc.cards[0]!.template.fields[0]!.label = '   '
+      expect(problemsOf(doc)).toEqual([expect.stringContaining('cards.0.template.fields.0.label')])
+    })
   })
 
   describe('integrity errors', () => {

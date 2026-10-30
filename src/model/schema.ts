@@ -5,9 +5,15 @@ export const SCHEMA_VERSION = 1
 const Id = v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]+$/, 'IDs may only contain letters, digits, "_" and "-"'))
 const Name = v.pipe(v.string(), v.trim(), v.nonEmpty())
 
+/** Entries every field type has. The label names the field for the user, e.g. "Haltestelle". */
+const fieldBase = {
+  id: Id,
+  label: v.optional(Name),
+}
+
 const NumberField = v.pipe(
   v.object({
-    id: Id,
+    ...fieldBase,
     type: v.literal('number'),
     min: v.optional(v.number()),
     max: v.optional(v.number()),
@@ -26,19 +32,19 @@ const NumberField = v.pipe(
 )
 
 const ChoiceField = v.object({
-  id: Id,
+  ...fieldBase,
   type: v.literal('choice'),
   listId: Id,
 })
 
 const DateTimeField = v.object({
-  id: Id,
+  ...fieldBase,
   type: v.literal('datetime'),
   mode: v.picklist(['date', 'time', 'both']),
 })
 
 const TextField = v.object({
-  id: Id,
+  ...fieldBase,
   type: v.literal('text'),
 })
 
