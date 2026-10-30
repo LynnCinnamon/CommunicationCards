@@ -1,6 +1,7 @@
 import type { Doc } from '../model/schema.ts'
+import { TemplateText } from './TemplateText.tsx'
 
-/** Lists all sets with their cards. Placeholder until cards can be opened. */
+/** Lists all sets with their cards. Cards cannot be opened yet. */
 export function CardListView({ doc }: { doc: Doc }) {
   // Look up cards by ID once instead of searching the array for every set entry
   const cardsById = new Map(doc.cards.map((card) => [card.id, card]))
@@ -11,10 +12,19 @@ export function CardListView({ doc }: { doc: Doc }) {
       {doc.sets.map((set) => (
         <section key={set.id}>
           <h2>{set.name}</h2>
-          <ul>
-            {set.cardIds.map((cardId) => (
-              <li key={cardId}>{cardsById.get(cardId)?.template.text}</li>
-            ))}
+          <ul class="card-list">
+            {set.cardIds.map((cardId) => {
+              const card = cardsById.get(cardId)
+              // Integrity checks guarantee the card exists; skipping keeps the types honest
+              if (!card) return null
+              return (
+                <li key={cardId}>
+                  <button type="button" class="card-button">
+                    <TemplateText template={card.template} lists={doc.lists} />
+                  </button>
+                </li>
+              )
+            })}
           </ul>
         </section>
       ))}
