@@ -1,3 +1,4 @@
+import { type ComponentChildren, Fragment } from 'preact'
 import type { Field, List, Template } from '../model/schema.ts'
 import { parseTemplate } from '../model/template.ts'
 
@@ -8,7 +9,8 @@ const typeNames = {
   datetime: { date: 'Datum', time: 'Uhrzeit', both: 'Datum & Uhrzeit' },
 } as const
 
-function fieldName(field: Field, lists: List[]): string {
+/** The name shown for a field: in chips and as the heading of its input. */
+export function fieldName(field: Field, lists: List[]): string {
   if (field.label) return field.label
   switch (field.type) {
     case 'choice':
@@ -23,20 +25,34 @@ function fieldName(field: Field, lists: List[]): string {
 type Props = {
   template: Template
   lists: List[]
+  /** Display text per field ID. Fields without an entry are shown as chips. */
+  values?: Record<string, string>
+  /** Wraps a field's value or chip, e.g. to make it tappable. Without it, fields are plain text. */
+  renderField?: (field: Field, content: ComponentChildren) => ComponentChildren
 }
 
-/** A template's text with its placeholders shown as named, unfilled chips: "Noch [Anzahl] Haltestellen?". */
-export function TemplateText({ template, lists }: Props) {
+/**
+ * A template's text with filled fields shown as their value and the others as named chips:
+ * "Noch 3 Haltestellen?" or "Noch [Anzahl] Haltestellen?".
+ */
+export function TemplateText({ template, lists, values, renderField }: Props) {
   // Templates are integrity-checked on load, so parsing cannot fail and every placeholder has a field
   return (
     <>
       {parseTemplate(template.text).map((segment, i) => {
         if (segment.kind === 'text') return segment.value
         const field = template.fields.find((f) => f.id === segment.fieldId)
+        const value = values?.[segment.fieldId]
+        const content =
+          value !== undefined ? (
+            <strong class="filled">{value}</strong>
+          ) : (
+            <span class="placeholder">{field ? fieldName(field, lists) : segment.fieldId}</span>
+          )
         return (
-          <span key={i} class="placeholder">
-            {field ? fieldName(field, lists) : segment.fieldId}
-          </span>
+          <Fragment key={i}>
+            {field && renderField ? renderField(field, content) : content}
+          </Fragment>
         )
       })}
     </>
