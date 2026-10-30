@@ -89,8 +89,9 @@ function checkTemplate(
   }
 
   for (const id of placeholders) {
-    if (!fieldIds.includes(id))
+    if (!fieldIds.includes(id)) {
       problems.push(`${where}: placeholder "{${id}}" has no field definition`)
+    }
   }
   for (const id of fieldIds) {
     if (!placeholders.includes(id)) problems.push(`${where}: field "${id}" is not used in the text`)
