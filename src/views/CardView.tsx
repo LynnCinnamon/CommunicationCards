@@ -5,11 +5,14 @@ import type { Card, Doc, Field, List } from '../model/schema.ts'
 import { routeHref } from '../router.ts'
 import { ChoiceButtons } from './fields/ChoiceButtons.tsx'
 import { ChoicePicker } from './fields/ChoicePicker.tsx'
+import { DateTimePicker } from './fields/DateTimePicker.tsx'
 import { NumberStepper } from './fields/NumberStepper.tsx'
 import { TextInput } from './fields/TextInput.tsx'
 import { TemplateText, fieldName } from './TemplateText.tsx'
 
-/** Number fields hold their number, choice fields the ID of the selected list value. */
+/** Number fields hold their number, choice fields the ID of the selected list value.
+ * Text and datetime fields hold their string, which may be empty.
+ */
 type FieldValue = number | string
 
 type Props = {
@@ -60,11 +63,13 @@ function CardForm({ card, lists }: { card: Card; lists: List[] }) {
     if (text !== undefined) displayValues[field.id] = text
   }
 
-  // Choice fields in the sentence open the native picker, a shortcut for long lists
+  // Fields in the sentence are tappable, a shortcut to their input below.
+  // Choice fields can't use a label: below are several buttons rather than one input,
+  // and a label would only focus a select without opening it. So they get their own select.
   const renderField = (field: Field, content: ComponentChildren) => {
-    if (field.type === 'text') {
+    if (field.type === 'text' || field.type === 'datetime') {
       return (
-        <label class="text-field-link" for={inputId(field)}>
+        <label class="field-link" for={inputId(field)}>
           {content}
         </label>
       )
@@ -146,6 +151,16 @@ function FieldInput({ inputId, field, value, lists, onChange }: FieldInputProps)
           onChange={onChange}
         />
       )
+    case 'datetime':
+      return (
+        <DateTimePicker
+          id={inputId}
+          mode={field.mode}
+          label={fieldName(field, lists)}
+          value={typeof value === 'string' ? value : ''}
+          onChange={onChange}
+        />
+      )
     default:
       return <p class="hint">Dieser Feldtyp kommt später.</p>
   }
@@ -154,6 +169,7 @@ function FieldInput({ inputId, field, value, lists, onChange }: FieldInputProps)
 /**
  * Number fields start at their initial number. Choice fields start empty, so the user can't
  * show a value they never chose.
+ * Text and datetime fields start empty.
  */
 function initialValues(card: Card): Record<string, FieldValue> {
   const values: Record<string, FieldValue> = {}
@@ -182,6 +198,8 @@ function displayValue(
       const text = typeof value === 'string' ? value.trim() : ''
       return text === '' ? undefined : text
     }
+    case 'datetime':
+      return typeof value === 'string' && value !== '' ? value : undefined
     default:
       return String(value)
   }

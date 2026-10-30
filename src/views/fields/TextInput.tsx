@@ -11,7 +11,7 @@ export function TextInput({ id, label, value, onChange }: Props) {
   return (
     <input
       id={id}
-      class="text-input"
+      class="field-input"
       type="text"
       inputMode="text"
       enterKeyHint="done"

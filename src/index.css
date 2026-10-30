@@ -170,7 +170,7 @@ a.card-button {
 
 /* A filled value looks like plain text otherwise, so hint that it can still be changed */
 .choice-picker .filled,
-.text-field-link .filled {
+.field-link .filled {
   text-decoration: underline dotted;
   text-underline-offset: 0.2em;
 }
@@ -220,7 +220,7 @@ a.card-button {
   font-weight: 600;
 }
 
-.text-input {
+.field-input {
   height: 3.5rem;
   font: inherit;
   font-size: 1.5rem;
@@ -232,6 +232,6 @@ a.card-button {
   width: 100%;
 }
 
-.text-field-link {
+.field-link {
   cursor: pointer;
 }

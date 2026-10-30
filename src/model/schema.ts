@@ -92,6 +92,7 @@ export const DocSchema = v.object({
 
 export type Field = v.InferOutput<typeof FieldSchema>
 export type NumberField = Extract<Field, { type: 'number' }>
+export type DateTimeField = Extract<Field, { type: 'datetime' }>
 export type Template = v.InferOutput<typeof TemplateSchema>
 export type Reply = v.InferOutput<typeof ReplySchema>
 export type Card = v.InferOutput<typeof CardSchema>

@@ -15,7 +15,18 @@ export const exampleDoc: Doc = {
     },
   ],
   sets: [
-    { id: 'oepnv', name: 'ÖPNV', cardIds: ['noch-haltestellen', 'aussteigen', 'vorstellung'] },
+    {
+      id: 'oepnv',
+      name: 'ÖPNV',
+      cardIds: [
+        'noch-haltestellen',
+        'aussteigen',
+        'vorstellung',
+        'treffen-datetime',
+        'treffen-date',
+        'treffen-time',
+      ],
+    },
   ],
   cards: [
     {
@@ -52,6 +63,30 @@ export const exampleDoc: Doc = {
       template: {
         text: 'Hallo, ich bin {name}.',
         fields: [{ id: 'name', label: 'Name', type: 'text' }],
+      },
+      replies: [],
+    },
+    {
+      id: 'treffen-datetime',
+      template: {
+        text: 'Treffen am um {when}?',
+        fields: [{ id: 'when', label: 'Datum & Uhrzeit', type: 'datetime', mode: 'both' }],
+      },
+      replies: [],
+    },
+    {
+      id: 'treffen-date',
+      template: {
+        text: 'Treffen am {when}?',
+        fields: [{ id: 'when', label: 'Datum', type: 'datetime', mode: 'date' }],
+      },
+      replies: [],
+    },
+    {
+      id: 'treffen-time',
+      template: {
+        text: 'Treffen um {when}?',
+        fields: [{ id: 'when', label: 'Uhrzeit', type: 'datetime', mode: 'time' }],
       },
       replies: [],
     },
