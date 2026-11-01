@@ -1,4 +1,4 @@
-import { type ComponentChildren, Fragment } from 'preact'
+import { Fragment, type ComponentChildren } from 'preact'
 import type { Field, List, Template } from '../model/schema.ts'
 import { parseTemplate } from '../model/template.ts'
 

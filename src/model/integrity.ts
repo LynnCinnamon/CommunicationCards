@@ -1,5 +1,5 @@
 import type { Doc, Template } from './schema.ts'
-import { TemplateSyntaxError, parseTemplate } from './template.ts'
+import { parseTemplate, TemplateSyntaxError } from './template.ts'
 
 /**
  * Checks what the structural schema cannot: unique IDs, references between

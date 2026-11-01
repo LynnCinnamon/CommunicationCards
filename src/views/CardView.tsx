@@ -9,7 +9,7 @@ import { ChoicePicker } from './fields/ChoicePicker.tsx'
 import { DateTimePicker } from './fields/DateTimePicker.tsx'
 import { NumberStepper } from './fields/NumberStepper.tsx'
 import { TextInput } from './fields/TextInput.tsx'
-import { TemplateText, fieldName } from './TemplateText.tsx'
+import { fieldName, TemplateText } from './TemplateText.tsx'
 
 /** Number fields hold their number, choice fields the ID of the selected list value.
  * Text and datetime fields hold their string, which may be empty.

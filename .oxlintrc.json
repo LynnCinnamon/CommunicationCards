@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "react"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "eqeqeq": "error",
+    "no-cond-assign": "error",
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "warn",
+    // Preact needs no React import for JSX
+    "react/react-in-jsx-scope": "off",
+    // React Compiler rules: they assume React's concurrent rendering, where a render can be
+    // thrown away. Preact renders synchronously, so writing a ref during render is safe there.
+    "react/refs": "off",
+    "react/immutability": "off"
+  },
+  "ignorePatterns": ["dist"]
+}
