@@ -21,7 +21,7 @@ export function CardListView({ doc }: { doc: Doc }) {
               return (
                 <li key={cardId}>
                   {/* A link, not a button: opening a card is navigation and must create a history entry */}
-                  <a class="card-button" href={routeHref({ name: 'card', cardId })}>
+                  <a class="card-button" href={routeHref({ name: 'card', cardId, show: false })}>
                     <TemplateText template={card.template} lists={doc.lists} />
                   </a>
                 </li>

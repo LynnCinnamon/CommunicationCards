@@ -235,3 +235,49 @@ a.card-button {
 .field-link {
   cursor: pointer;
 }
+
+/* The screen's main action, so solid like a selected choice button; sizes match the inputs above */
+.show-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.5rem;
+  margin-top: 1.5rem;
+  padding: 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--surface);
+  background: var(--accent);
+  border-radius: 0.75rem;
+}
+
+/* Covers the whole screen, so the other person sees only the sentence */
+.card-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: var(--surface);
+  /* Long sentences scroll inside the overlay instead of moving the page behind it */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Flex children stretch to full width by default, which would center the button's text */
+.card-overlay .back-button {
+  align-self: flex-start;
+}
+
+/* Auto margins center the text vertically in the space left below the close button */
+.card-overlay-text {
+  margin: auto 0;
+  /*
+   * Grows with the screen, limited by width in portrait and by height in landscape.
+   * Sentence length isn't taken into account: very long ones scroll
+   */
+  font-size: clamp(2rem, min(13vw, 9vh), 7rem);
+  line-height: 1.3;
+  font-weight: 600;
+}

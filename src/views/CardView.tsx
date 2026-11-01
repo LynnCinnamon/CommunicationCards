@@ -1,5 +1,5 @@
 import type { ComponentChildren } from 'preact'
-import { useId, useState } from 'preact/hooks'
+import { useEffect, useId, useState } from 'preact/hooks'
 import { formatDateTime } from '../model/dateTimeField.ts'
 import { initialNumber } from '../model/numberField.ts'
 import type { Card, Doc, Field, List } from '../model/schema.ts'
@@ -19,10 +19,11 @@ type FieldValue = number | string
 type Props = {
   doc: Doc
   cardId: string
+  show: boolean
 }
 
 /** A single opened card, or a way back if it doesn't exist. */
-export function CardView({ doc, cardId }: Props) {
+export function CardView({ doc, cardId, show }: Props) {
   const card = doc.cards.find((c) => c.id === cardId)
 
   return (
@@ -34,7 +35,7 @@ export function CardView({ doc, cardId }: Props) {
 
       {card ? (
         // The key gives every card its own component instance, so values never carry over between cards
-        <CardForm key={card.id} card={card} lists={doc.lists} />
+        <CardForm key={card.id} card={card} lists={doc.lists} show={show} />
       ) : (
         // An old link or a deleted card: offer a way out instead of an empty screen
         <>
@@ -47,11 +48,27 @@ export function CardView({ doc, cardId }: Props) {
 }
 
 /** The card's sentence as a live preview, with one input per field below it. */
-function CardForm({ card, lists }: { card: Card; lists: List[] }) {
+function CardForm({ card, lists, show }: { card: Card; lists: List[]; show: boolean }) {
   // A function, so the initial values are only computed on the first render
   const [values, setValues] = useState(() => initialValues(card))
   const idPrefix = useId()
   const inputId = (field: Field) => `${idPrefix}-${field.id}`
+
+  // On mount, show can only be set by a reload or a link. The values are gone then,
+  // so return to the form instead of showing an empty sentence.
+  useEffect(() => {
+    if (show) {
+      // Opened via "Zeigen": the form's entry is right before this one, so going back
+      // avoids leaving it in the history twice. Without the mark there may be no such entry.
+      if (history.state?.fromCard) {
+        history.back()
+        return
+      }
+      location.replace(routeHref({ name: 'card', cardId: card.id, show: false }))
+    }
+    // Only the value at mount matters; later changes of show are the overlay opening and closing
+    // oxlint-disable-next-line react/exhaustive-deps
+  }, [])
 
   const setValue = (fieldId: string, value: FieldValue) => {
     // A new object instead of changing the old one, otherwise Preact doesn't notice the change
@@ -89,6 +106,12 @@ function CardForm({ card, lists }: { card: Card; lists: List[] }) {
     )
   }
 
+  const markNavigation = (e: MouseEvent) => {
+    e.preventDefault()
+    location.hash = routeHref({ name: 'card', cardId: card.id, show: true })
+    history.replaceState({ fromCard: true }, '')
+  }
+
   return (
     <>
       <p class="card-text">
@@ -112,6 +135,23 @@ function CardForm({ card, lists }: { card: Card; lists: List[] }) {
           />
         </fieldset>
       ))}
+      <a
+        class="show-link"
+        href={routeHref({ name: 'card', cardId: card.id, show: true })}
+        onClick={markNavigation}
+      >
+        Zeigen
+      </a>
+      {show && (
+        <div class="card-overlay">
+          <button type="button" class="back-button" onClick={() => history.back()}>
+            ← Zurück
+          </button>
+          <p class="card-overlay-text">
+            <TemplateText template={card.template} lists={lists} values={displayValues} />
+          </p>
+        </div>
+      )}
     </>
   )
 }

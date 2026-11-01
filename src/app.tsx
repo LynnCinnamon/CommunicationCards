@@ -57,7 +57,7 @@ export function App() {
       return <InvalidDataView problems={state.problems} raw={state.raw} onReset={reset} />
     case 'ok':
       return route.name === 'card' ? (
-        <CardView doc={state.doc} cardId={route.cardId} />
+        <CardView doc={state.doc} cardId={route.cardId} show={route.show} />
       ) : (
         <CardListView doc={state.doc} />
       )
