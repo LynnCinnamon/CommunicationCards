@@ -69,7 +69,7 @@ export const exampleDoc: Doc = {
     {
       id: 'treffen-datetime',
       template: {
-        text: 'Treffen am um {when}?',
+        text: 'Treffen am {when}?',
         fields: [{ id: 'when', label: 'Datum & Uhrzeit', type: 'datetime', mode: 'both' }],
       },
       replies: [],
