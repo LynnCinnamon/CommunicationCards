@@ -67,14 +67,13 @@ function CardForm({ card, lists }: { card: Card; lists: List[] }) {
   // Choice fields can't use a label: below are several buttons rather than one input,
   // and a label would only focus a select without opening it. So they get their own select.
   const renderField = (field: Field, content: ComponentChildren) => {
-    if (field.type === 'text' || field.type === 'datetime') {
+    if (field.type !== 'choice') {
       return (
         <label class="field-link" for={inputId(field)}>
           {content}
         </label>
       )
     }
-    if (field.type !== 'choice') return content
     const list = lists.find((l) => l.id === field.listId)
     if (!list) return content
     return (
@@ -136,6 +135,7 @@ function FieldInput({ inputId, field, value, lists, onChange }: FieldInputProps)
     case 'number':
       return (
         <NumberStepper
+          id={inputId}
           field={field}
           label={fieldName(field, lists)}
           value={typeof value === 'number' ? value : initialNumber(field)}

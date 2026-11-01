@@ -4,6 +4,7 @@ import type { NumberField } from '../../model/schema.ts'
 import { useRepeatPress } from './useRepeatPress.ts'
 
 type Props = {
+  id: string
   field: NumberField
   /** Used to name the buttons and the input for screen readers */
   label: string
@@ -12,7 +13,7 @@ type Props = {
 }
 
 /** − and + buttons around the number; tapping the number opens the numeric keyboard. */
-export function NumberStepper({ field, label, value, onChange }: Props) {
+export function NumberStepper({ id, field, label, value, onChange }: Props) {
   // The text while typing, which may be incomplete like "" or "-". Null when not typing.
   const [draft, setDraft] = useState<string | null>(null)
 
@@ -58,6 +59,7 @@ export function NumberStepper({ field, label, value, onChange }: Props) {
         class="stepper-value"
         // Not type="number": that accepts "1e5", reports half-typed input as "" and reacts to the mouse wheel
         type="text"
+        id={id}
         inputMode="numeric"
         enterKeyHint="done"
         aria-label={label}
