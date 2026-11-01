@@ -1,6 +1,4 @@
-import type { DateTimeField } from '../../model/schema.ts'
-
-type DateTimeMode = DateTimeField['mode']
+import type { DateTimeMode } from '../../model/schema.ts'
 
 type Props = {
   id: string

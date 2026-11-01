@@ -1,5 +1,6 @@
 import type { ComponentChildren } from 'preact'
 import { useId, useState } from 'preact/hooks'
+import { formatDateTime } from '../model/dateTimeField.ts'
 import { initialNumber } from '../model/numberField.ts'
 import type { Card, Doc, Field, List } from '../model/schema.ts'
 import { routeHref } from '../router.ts'
@@ -199,7 +200,7 @@ function displayValue(
       return text === '' ? undefined : text
     }
     case 'datetime':
-      return typeof value === 'string' && value !== '' ? value : undefined
+      return typeof value === 'string' ? formatDateTime(value, field.mode) : undefined
     default:
       return String(value)
   }
