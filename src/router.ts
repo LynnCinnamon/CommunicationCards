@@ -6,7 +6,8 @@ import { useEffect, useState } from 'preact/hooks'
  * `/show` is appended to the URL when the card is displayed in an overlay,
  * so the back button closes the overlay.
  */
-export type Route = { name: 'list' } | { name: 'card'; cardId: string; show: boolean }
+export type Route =
+  { name: 'list' } | { name: 'card'; cardId: string; show: boolean } | { name: 'settings' }
 
 /** URL for a route, for use in `href`. IDs only contain URL-safe characters, so no encoding is needed. */
 export function routeHref(route: Route): string {
@@ -15,12 +16,15 @@ export function routeHref(route: Route): string {
       return '#/'
     case 'card':
       return `#/card/${route.cardId}${route.show ? '/show' : ''}`
+    case 'settings':
+      return '#/settings'
   }
 }
 
 export function parseHash(hash: string): Route {
   const match = /^#\/card\/([A-Za-z0-9_-]+)(\/show)?$/.exec(hash)
   if (match) return { name: 'card', cardId: match[1]!, show: match[2] !== undefined }
+  if (hash === '#/settings') return { name: 'settings' }
   // Unknown or empty hashes fall back to the list instead of showing an error
   return { name: 'list' }
 }

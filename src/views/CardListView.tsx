@@ -10,6 +10,7 @@ export function CardListView({ doc }: { doc: Doc }) {
   return (
     <main>
       <h1>Communication Cards</h1>
+      <a href={routeHref({ name: 'settings' })}>⚙️ Einstellungen</a>
       {doc.sets.map((set) => (
         <section key={set.id}>
           <h2>{set.name}</h2>

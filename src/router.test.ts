@@ -25,7 +25,7 @@ describe('parseHash', () => {
   it('falls back to the list for empty and unknown hashes', () => {
     expect(parseHash('')).toEqual({ name: 'list' })
     expect(parseHash('#/')).toEqual({ name: 'list' })
-    expect(parseHash('#/settings')).toEqual({ name: 'list' })
+    expect(parseHash('#/unknown')).toEqual({ name: 'list' })
   })
 
   it('falls back to the list for malformed card hashes', () => {
@@ -42,6 +42,7 @@ describe('routeHref and parseHash', () => {
       { name: 'list' },
       { name: 'card', cardId: 'abc', show: false },
       { name: 'card', cardId: 'abc', show: true },
+      { name: 'settings' },
     ]
     for (const route of routes) {
       expect(parseHash(routeHref(route))).toEqual(route)

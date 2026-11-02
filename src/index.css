@@ -252,6 +252,34 @@ a.card-button {
   border-radius: 0.75rem;
 }
 
+/* One element per row with even gaps, like the card list */
+.settings-section {
+  display: grid;
+  gap: 0.75rem;
+}
+
+/* The grid gap does the spacing; default paragraph margins would add to it */
+.settings-section p {
+  margin: 0;
+}
+
+/* Grid items stretch, so these are full width: easy to hit with a thumb */
+.settings-button {
+  min-height: 3rem;
+  padding: 0 1rem;
+  font: inherit;
+  font-size: 1.125rem;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+.settings-button:active {
+  background: var(--accent-soft);
+}
+
 /* Covers the whole screen, so the other person sees only the sentence */
 .card-overlay {
   position: fixed;

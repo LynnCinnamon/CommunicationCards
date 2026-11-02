@@ -6,6 +6,7 @@ import { loadDoc, saveDoc } from './storage/docStore.ts'
 import { CardListView } from './views/CardListView.tsx'
 import { CardView } from './views/CardView.tsx'
 import { InvalidDataView } from './views/InvalidDataView.tsx'
+import { SettingsView } from './views/SettingsView.tsx'
 
 type AppState =
   | { status: 'loading' }
@@ -40,7 +41,7 @@ export function App() {
   }, [])
 
   const reset = () => {
-    saveDefaultDoc().then((doc) => setState({ status: 'ok', doc }), showError)
+    return saveDefaultDoc().then((doc) => setState({ status: 'ok', doc }), showError)
   }
 
   switch (state.status) {
@@ -56,10 +57,15 @@ export function App() {
     case 'invalid':
       return <InvalidDataView problems={state.problems} raw={state.raw} onReset={reset} />
     case 'ok':
-      return route.name === 'card' ? (
-        <CardView doc={state.doc} cardId={route.cardId} show={route.show} />
-      ) : (
-        <CardListView doc={state.doc} />
-      )
+      switch (route.name) {
+        case 'settings':
+          return <SettingsView onReset={reset} />
+        case 'card': {
+          return <CardView doc={state.doc} cardId={route.cardId} show={route.show} />
+        }
+        case 'list': {
+          return <CardListView doc={state.doc} />
+        }
+      }
   }
 }
