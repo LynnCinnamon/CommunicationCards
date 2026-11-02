@@ -59,7 +59,7 @@ export function App() {
     case 'ok':
       switch (route.name) {
         case 'settings':
-          return <SettingsView onReset={reset} />
+          return <SettingsView doc={state.doc} onReset={reset} />
         case 'card': {
           return <CardView doc={state.doc} cardId={route.cardId} show={route.show} />
         }

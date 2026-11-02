@@ -1,7 +1,10 @@
 import { useState } from 'preact/hooks'
+import type { Doc } from '../model/schema.ts'
+import { getDateString } from '../storage/dateFuncs.ts'
+import { downloadJson } from '../storage/downloadJson.ts'
 
-/** Settings screen, currently only a reset button. */
-export function SettingsView({ onReset }: { onReset: () => Promise<void> }) {
+/** Settings screen, a reset button and export option. */
+export function SettingsView({ doc, onReset }: { doc: Doc; onReset: () => Promise<void> }) {
   const [confirmingReset, setConfirmingReset] = useState(false)
   const [showResetMessage, setShowResetMessage] = useState(false)
 
@@ -17,14 +20,21 @@ export function SettingsView({ onReset }: { onReset: () => Promise<void> }) {
     setShowResetMessage(false)
   }
 
+  const exportDoc = () => {
+    const dateStr = getDateString()
+    downloadJson(doc, `communication-cards-${dateStr}.json`)
+  }
+
   return (
     <main>
       <button type="button" class="back-button" onClick={() => history.back()}>
         ← Zurück
       </button>
       <h1>Einstellungen</h1>
-
       <section class="settings-section">
+        <button type="button" class="settings-button" onClick={exportDoc}>
+          Karten exportieren
+        </button>
         {confirmingReset ? (
           <>
             <p>Alle gespeicherten Karten werden durch die Beispielkarten ersetzt.</p>

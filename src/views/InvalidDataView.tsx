@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks'
+import { getDateString } from '../storage/dateFuncs.ts'
 import { downloadJson } from '../storage/downloadJson.ts'
 
 type Props = {
@@ -16,7 +17,7 @@ export function InvalidDataView({ problems, raw, onReset }: Props) {
   const [confirmingReset, setConfirmingReset] = useState(false)
 
   const exportRaw = () => {
-    const date = new Date().toISOString().slice(0, 10)
+    const date = getDateString()
     downloadJson(raw, `communication-cards-defekt-${date}.json`)
   }
 
