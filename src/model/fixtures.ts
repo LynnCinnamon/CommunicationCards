@@ -18,14 +18,17 @@ export const exampleDoc: Doc = {
     {
       id: 'oepnv',
       name: 'ÖPNV',
-      cardIds: [
-        'noch-haltestellen',
-        'aussteigen',
-        'vorstellung',
-        'treffen-datetime',
-        'treffen-date',
-        'treffen-time',
-      ],
+      cardIds: ['noch-haltestellen', 'aussteigen'],
+    },
+    {
+      id: 'smalltalk',
+      name: 'Smalltalk',
+      cardIds: ['vorstellung'],
+    },
+    {
+      id: 'treffen',
+      name: 'Treffen',
+      cardIds: ['treffen-datetime', 'treffen-date', 'treffen-time'],
     },
   ],
   cards: [
