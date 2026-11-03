@@ -44,6 +44,12 @@ export function App() {
     return saveDefaultDoc().then((doc) => setState({ status: 'ok', doc }), showError)
   }
 
+  const importDoc = (doc: Doc) => {
+    // Later we can let the component handle this error, but for now just show it in the main area.
+    // showError swallows the rejection, so ImportDoc's success message would run on failure if this ever stops being full-screen
+    return saveDoc(doc).then(() => setState({ status: 'ok', doc }), showError)
+  }
+
   switch (state.status) {
     case 'loading':
       return <main>Lädt …</main>
@@ -55,11 +61,18 @@ export function App() {
         </main>
       )
     case 'invalid':
-      return <InvalidDataView problems={state.problems} raw={state.raw} onReset={reset} />
+      return (
+        <InvalidDataView
+          problems={state.problems}
+          raw={state.raw}
+          onReset={reset}
+          onImport={importDoc}
+        />
+      )
     case 'ok':
       switch (route.name) {
         case 'settings':
-          return <SettingsView doc={state.doc} onReset={reset} />
+          return <SettingsView doc={state.doc} onReset={reset} onImport={importDoc} />
         case 'card': {
           return <CardView doc={state.doc} cardId={route.cardId} show={route.show} />
         }

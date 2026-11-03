@@ -1,18 +1,21 @@
 import { useState } from 'preact/hooks'
+import type { Doc } from '../model/schema.ts'
 import { getDateString } from '../storage/dateFuncs.ts'
 import { downloadJson } from '../storage/downloadJson.ts'
+import { ImportDoc } from './ImportDoc.tsx'
 
 type Props = {
   problems: string[]
   raw: unknown
+  onImport: (doc: Doc) => Promise<void>
   onReset: () => void
 }
 
 /**
  * Shown instead of the app when the stored data is invalid. Nothing is saved from
- * here except an explicit reset, so the broken data survives until the user decides.
+ * here except explicit reset or import, so the broken data survives until the user decides.
  */
-export function InvalidDataView({ problems, raw, onReset }: Props) {
+export function InvalidDataView({ problems, raw, onReset, onImport }: Props) {
   // Reset deletes the stored data, so it needs a second tap
   const [confirmingReset, setConfirmingReset] = useState(false)
 
@@ -31,18 +34,28 @@ export function InvalidDataView({ problems, raw, onReset }: Props) {
           <li key={i}>{problem}</li>
         ))}
       </ul>
+      <div class="action-list">
+        <button class="action-button" onClick={exportRaw}>
+          Daten exportieren
+        </button>
+        <ImportDoc onImport={onImport} />
 
-      <button onClick={exportRaw}>Daten exportieren</button>
-
-      {confirmingReset ? (
-        <>
-          <p>Alle gespeicherten Karten werden durch die Beispielkarten ersetzt.</p>
-          <button onClick={onReset}>Ja, zurücksetzen</button>
-          <button onClick={() => setConfirmingReset(false)}>Abbrechen</button>
-        </>
-      ) : (
-        <button onClick={() => setConfirmingReset(true)}>Auf Beispielkarten zurücksetzen</button>
-      )}
+        {confirmingReset ? (
+          <>
+            <p>Alle gespeicherten Karten werden durch die Beispielkarten ersetzt.</p>
+            <button class="action-button" onClick={onReset}>
+              Ja, zurücksetzen
+            </button>
+            <button class="action-button" onClick={() => setConfirmingReset(false)}>
+              Abbrechen
+            </button>
+          </>
+        ) : (
+          <button class="action-button" onClick={() => setConfirmingReset(true)}>
+            Auf Beispielkarten zurücksetzen
+          </button>
+        )}
+      </div>
     </main>
   )
 }

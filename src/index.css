@@ -252,19 +252,19 @@ a.card-button {
   border-radius: 0.75rem;
 }
 
-/* One element per row with even gaps, like the card list */
-.settings-section {
+/* Shared by Settings and the broken-data screen: one element per row with even gaps, like the card list */
+.action-list {
   display: grid;
   gap: 0.75rem;
 }
 
 /* The grid gap does the spacing; default paragraph margins would add to it */
-.settings-section p {
+.action-list p {
   margin: 0;
 }
 
 /* Grid items stretch, so these are full width: easy to hit with a thumb */
-.settings-button {
+.action-button {
   min-height: 3rem;
   padding: 0 1rem;
   font: inherit;
@@ -276,7 +276,7 @@ a.card-button {
   cursor: pointer;
 }
 
-.settings-button:active {
+.action-button:active {
   background: var(--accent-soft);
 }
 
