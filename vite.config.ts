@@ -3,5 +3,7 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  /* GitHub Pages serves the app at /<repo-name>/ */
+  base: '/CommunicationCards/',
   plugins: [preact()],
 })
