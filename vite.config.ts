@@ -14,10 +14,10 @@ export default defineConfig({
     preact(),
     // Generates a service worker that caches the built app, so it opens without network
     VitePWA({
-      // A new version waits until every app window is closed instead of reloading open ones
-      // (that could happen mid-conversation). An "update available" banner comes later.
+      // A new version waits instead of reloading open windows (that could happen mid-conversation);
+      // UpdateBanner offers the reload, otherwise it activates once every app window is closed
       registerType: 'prompt',
-      // Adds a small registration script to index.html
+      // Registration happens in UpdateBanner via useRegisterSW, so 'auto' injects no extra script
       injectRegister: 'auto',
       manifest: {
         name: 'Communication Cards',
