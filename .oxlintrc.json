@@ -1,11 +1,13 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "unicorn", "oxc", "react"],
+  "plugins": ["typescript", "unicorn", "oxc", "react", "import"],
   "categories": {
     "correctness": "error"
   },
   "rules": {
     "eqeqeq": "error",
+    // Relative imports need their extension (.ts/.tsx); package imports like 'preact/hooks' don't
+    "import/extensions": ["error", "always", { "ignorePackages": true }],
     "no-cond-assign": "error",
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "warn",
