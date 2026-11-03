@@ -11,6 +11,7 @@ export type LoadResult =
   | { status: 'empty' }
   | { status: 'ok'; doc: Doc }
   | { status: 'invalid'; problems: string[]; raw: unknown }
+  | { status: 'too-new' }
 
 /**
  * Loads the stored doc. Stored data is validated like an import, because it may
@@ -22,9 +23,14 @@ export async function loadDoc(): Promise<LoadResult> {
   if (raw === undefined) return { status: 'empty' }
 
   const result = parseDoc(raw)
-  return result.ok
-    ? { status: 'ok', doc: result.doc }
-    : { status: 'invalid', problems: result.problems, raw }
+  switch (result.status) {
+    case 'ok':
+      return { status: 'ok', doc: result.doc }
+    case 'invalid':
+      return { status: 'invalid', problems: result.problems, raw }
+    case 'too-new':
+      return { status: 'too-new' }
+  }
 }
 
 /** Saves the doc. Refuses inconsistent data so a bug can't corrupt what is stored. */

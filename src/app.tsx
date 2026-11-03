@@ -13,6 +13,7 @@ type AppState =
   | { status: 'ok'; doc: Doc }
   | { status: 'invalid'; problems: string[]; raw: unknown }
   | { status: 'error'; message: string }
+  | { status: 'too-new' }
 
 /** Stores a fresh copy of the example cards. Used on first launch and for a reset. */
 async function saveDefaultDoc(): Promise<Doc> {
@@ -24,8 +25,15 @@ async function saveDefaultDoc(): Promise<Doc> {
 
 async function startUp(): Promise<AppState> {
   const result = await loadDoc()
-  if (result.status !== 'empty') return result
-  return { status: 'ok', doc: await saveDefaultDoc() }
+
+  switch (result.status) {
+    case 'ok':
+    case 'invalid':
+    case 'too-new':
+      return result
+    case 'empty':
+      return { status: 'ok', doc: await saveDefaultDoc() }
+  }
 }
 
 export function App() {
@@ -59,6 +67,13 @@ export function App() {
         <main>
           <h1>Speicher nicht verfügbar</h1>
           <p>{state.message}</p>
+        </main>
+      )
+    case 'too-new':
+      return (
+        <main>
+          <h1>Karten aus neuerer App-Version</h1>
+          <p>Die geladenen Karten nutzen eine neuere Version. Bitte aktualisiere die App.</p>
         </main>
       )
     case 'invalid':

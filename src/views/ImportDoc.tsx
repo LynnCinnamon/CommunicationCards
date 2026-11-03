@@ -18,7 +18,7 @@ export function ImportDoc({ onImport }: { onImport: (doc: Doc) => Promise<void> 
 
       reader.onload = (e) => {
         if (!e.target?.result) {
-          setParseResult({ ok: false, problems: ['Die Datei ist leer.'] })
+          setParseResult({ status: 'invalid', problems: ['Die Datei ist leer.'] })
           return
         }
         let jsonObject: unknown = null
@@ -26,7 +26,7 @@ export function ImportDoc({ onImport }: { onImport: (doc: Doc) => Promise<void> 
           jsonObject = JSON.parse(e.target.result as string)
         } catch (err) {
           setParseResult({
-            ok: false,
+            status: 'invalid',
             problems: ['Die Datei ist keine gültige JSON-Datei.', String(err)],
           })
           return
@@ -36,7 +36,7 @@ export function ImportDoc({ onImport }: { onImport: (doc: Doc) => Promise<void> 
       }
       reader.onerror = () => {
         setParseResult({
-          ok: false,
+          status: 'invalid',
           problems: ['Fehler beim Lesen der Datei.', String(reader.error)],
         })
       }
@@ -52,7 +52,7 @@ export function ImportDoc({ onImport }: { onImport: (doc: Doc) => Promise<void> 
   }
 
   const onImportClick = () => {
-    if (parseResult?.ok) {
+    if (parseResult?.status === 'ok') {
       onImport(parseResult.doc).then(() => {
         setResultMessage(`Die Datei ${fileName} wurde erfolgreich importiert.`)
         setParseResult(null)
@@ -80,7 +80,7 @@ export function ImportDoc({ onImport }: { onImport: (doc: Doc) => Promise<void> 
         Karten importieren
       </button>
 
-      {parseResult?.ok && (
+      {parseResult?.status === 'ok' && (
         <>
           <p>{fileName} importieren? Alte Karten werden ersetzt.</p>
           <button type="button" class="action-button" onClick={onImportClick}>
@@ -91,13 +91,15 @@ export function ImportDoc({ onImport }: { onImport: (doc: Doc) => Promise<void> 
           </button>
         </>
       )}
-      {parseResult?.ok === false && (
+      {parseResult && parseResult.status !== 'ok' && (
         <div role="alert">
           <p>Beim Import der Datei {fileName} sind Fehler aufgetreten:</p>
           <ul>
-            {parseResult.problems.map((problem, index) => (
-              <li key={index}>{problem}</li>
-            ))}
+            {parseResult.status === 'too-new' && (
+              <li>Diese Datei nutzt eine neuere Version. Bitte aktualisiere die App.</li>
+            )}
+            {parseResult.status === 'invalid' &&
+              parseResult.problems.map((problem, index) => <li key={index}>{problem}</li>)}
           </ul>
         </div>
       )}

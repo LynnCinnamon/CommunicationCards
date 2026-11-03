@@ -7,27 +7,45 @@ const clone = (): Doc => structuredClone(exampleDoc)
 
 function problemsOf(data: unknown): string[] {
   const result = parseDoc(data)
-  return result.ok ? [] : result.problems
+  return result.status === 'invalid' ? result.problems : []
 }
 
 describe('parseDoc', () => {
   it('accepts the example doc', () => {
-    expect(parseDoc(exampleDoc)).toEqual({ ok: true, doc: exampleDoc })
+    expect(parseDoc(exampleDoc)).toEqual({ status: 'ok', doc: exampleDoc })
   })
 
   it('survives a JSON round trip', () => {
-    expect(parseDoc(JSON.parse(JSON.stringify(exampleDoc)))).toEqual({ ok: true, doc: exampleDoc })
+    expect(parseDoc(JSON.parse(JSON.stringify(exampleDoc)))).toEqual({
+      status: 'ok',
+      doc: exampleDoc,
+    })
+  })
+
+  describe('schema version', () => {
+    it('reports a higher version as too new', () => {
+      expect(parseDoc({ ...clone(), schemaVersion: 2 })).toEqual({ status: 'too-new' })
+    })
+
+    // A newer version may change the structure, so the v1 schema must not even look at it
+    it('reports too new even if the structure would be invalid for this version', () => {
+      expect(parseDoc({ schemaVersion: 2, cards: 'changed in v2' })).toEqual({ status: 'too-new' })
+    })
+
+    it.each([
+      ['a lower version', 0],
+      ['a version given as text', '2'],
+      ['a missing version', undefined],
+    ])('rejects %s as invalid', (_, schemaVersion) => {
+      expect(problemsOf({ ...clone(), schemaVersion })).toEqual([
+        expect.stringContaining('schemaVersion'),
+      ])
+    })
   })
 
   describe('structural errors', () => {
     it('rejects non-objects', () => {
       expect(problemsOf('hello')).not.toEqual([])
-    })
-
-    it('rejects an unknown schema version', () => {
-      expect(problemsOf({ ...clone(), schemaVersion: 2 })).toEqual([
-        expect.stringContaining('schemaVersion'),
-      ])
     })
 
     it('rejects an unknown field type with its path', () => {
