@@ -19,8 +19,18 @@ export default defineConfig({
       registerType: 'prompt',
       // Adds a small registration script to index.html
       injectRegister: 'auto',
-      // No web app manifest yet; that is the next step
-      manifest: false,
+      manifest: {
+        name: 'Communication Cards',
+        short_name: 'CommCards',
+        theme_color: '#18181b',
+        background_color: '#18181b',
+        lang: 'de',
+        id: 'communication-cards',
+      },
+      workbox: {
+        // Cache the built app (index.html, JS, CSS) and the generated icons
+        globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+      },
       // Renders the PNG icons (browser tab, Android, iOS) from the SVG and adds their <link> tags
       pwaAssets: {
         image: 'public/favicon.svg',
