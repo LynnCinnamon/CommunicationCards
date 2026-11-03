@@ -34,6 +34,7 @@ export function App() {
   const route = useRoute()
 
   const showError = (error: unknown) => setState({ status: 'error', message: String(error) })
+  const [setId, setSetId] = useState<string | null>(null)
 
   // Runs once after the first render; the empty array means "no dependencies"
   useEffect(() => {
@@ -77,7 +78,7 @@ export function App() {
           return <CardView doc={state.doc} cardId={route.cardId} show={route.show} />
         }
         case 'list': {
-          return <CardListView doc={state.doc} />
+          return <CardListView doc={state.doc} setId={setId} setSetId={setSetId} />
         }
       }
   }

@@ -41,6 +41,42 @@ h2 {
   margin: 1.5rem 0 0.5rem;
 }
 
+/*
+ * Wraps onto further rows instead of scrolling sideways: every set stays visible,
+ * nothing hides off-screen behind a swipe the user has to know about
+ */
+.set-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+/* Pill shape tells them apart from the full-width card buttons below */
+.set-tab {
+  min-height: 3rem;
+  padding: 0 1.25rem;
+  font: inherit;
+  font-size: 1.125rem;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.set-tab:active {
+  background: var(--accent-soft);
+}
+
+/* Selected looks like a selected choice button, so "solid = chosen" means the same everywhere */
+.set-tab[aria-pressed='true'] {
+  font-weight: 600;
+  color: var(--surface);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 .card-list {
   list-style: none;
   margin: 0;
