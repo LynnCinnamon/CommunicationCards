@@ -28,6 +28,11 @@ describe('docStore', () => {
     expect(result.problems).not.toEqual([])
   })
 
+  it('reports stored data from a newer app version as too new', async () => {
+    await set(DOC_KEY, { ...exampleDoc, schemaVersion: 2 }, store)
+    expect(await loadDoc()).toEqual({ status: 'too-new' })
+  })
+
   it('refuses to save an inconsistent doc and keeps the previous one', async () => {
     await saveDoc(exampleDoc)
     const broken: Doc = { ...exampleDoc, lists: [] } // choice field now points to a missing list
