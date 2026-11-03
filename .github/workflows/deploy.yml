@@ -1,10 +1,10 @@
-# Builds the app and publishes it to GitHub Pages on every push to main.
+# Checks every branch; builds and publishes to GitHub Pages only from main.
 # Nothing is deployed unless lint, tests and the build (which type-checks) pass.
-name: Deploy to GitHub Pages
+name: Check and deploy
 
 on:
   push:
-    branches: [main]
+    branches: ['**'] # Every branch, but not tags
   workflow_dispatch: # Allows a manual run from the Actions tab
 
 # Read the code, publish to Pages, and prove to Pages that this run is allowed to (id-token)
@@ -12,11 +12,6 @@ permissions:
   contents: read
   pages: write
   id-token: write
-
-# One deployment at a time; a newer push doesn't cancel one that's already publishing
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -31,13 +26,20 @@ jobs:
       - run: npm run lint
       - run: npm test -- --run # Without --run, Vitest would wait in watch mode
       - run: npm run build
-      - uses: actions/upload-pages-artifact@v5
+      - if: github.ref == 'refs/heads/main' # Branches are only checked, never published
+        uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
+    # One deployment at a time; a newer push doesn't cancel one that's already publishing.
+    # Set here, not for the whole workflow, so branch checks don't queue behind deploys.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
