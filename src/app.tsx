@@ -6,6 +6,7 @@ import { loadDoc, saveDoc } from './storage/docStore.ts'
 import { CardListView } from './views/CardListView.tsx'
 import { CardView } from './views/CardView.tsx'
 import { InvalidDataView } from './views/InvalidDataView.tsx'
+import { SetEditor } from './views/SetEditor.tsx'
 import { SettingsView } from './views/SettingsView.tsx'
 
 type AppState =
@@ -99,6 +100,8 @@ export function App() {
         case 'list': {
           return <CardListView doc={state.doc} setId={setId} setSetId={setSetId} />
         }
+        case 'set-editor':
+          return <SetEditor doc={state.doc} setId={route.setId} onSave={updateDoc} />
       }
   }
 }
