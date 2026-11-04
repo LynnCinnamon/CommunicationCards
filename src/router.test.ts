@@ -10,6 +10,11 @@ describe('routeHref', () => {
     expect(routeHref({ name: 'card', cardId: 'abc', show: false })).toBe('#/card/abc')
     expect(routeHref({ name: 'card', cardId: 'abc', show: true })).toBe('#/card/abc/show')
   })
+
+  it('leaves out the set ID for a new set', () => {
+    expect(routeHref({ name: 'set-editor', setId: 'abc' })).toBe('#/editor/set/abc')
+    expect(routeHref({ name: 'set-editor', setId: null })).toBe('#/editor/set')
+  })
 })
 
 describe('parseHash', () => {
@@ -34,6 +39,25 @@ describe('parseHash', () => {
     expect(parseHash('#/card/abc/shows')).toEqual({ name: 'list' })
     expect(parseHash('#/card/abc/show/extra')).toEqual({ name: 'list' })
   })
+
+  it('reads set editor routes with and without a set ID', () => {
+    expect(parseHash('#/editor/set/abc')).toEqual({ name: 'set-editor', setId: 'abc' })
+    expect(parseHash('#/editor/set')).toEqual({ name: 'set-editor', setId: null })
+  })
+
+  it('treats "new" as an ordinary set ID', () => {
+    expect(parseHash('#/editor/set/new')).toEqual({ name: 'set-editor', setId: 'new' })
+  })
+
+  it('falls back to the list for malformed and unknown editor hashes', () => {
+    expect(parseHash('#/editor')).toEqual({ name: 'list' })
+    expect(parseHash('#/editor/')).toEqual({ name: 'list' })
+    expect(parseHash('#/editor/set/')).toEqual({ name: 'list' })
+    expect(parseHash('#/editor/set/a b')).toEqual({ name: 'list' })
+    expect(parseHash('#/editor/set/abc/extra')).toEqual({ name: 'list' })
+    expect(parseHash('#/editor/unknown')).toEqual({ name: 'list' })
+    expect(parseHash('#/editor/unknown/abc')).toEqual({ name: 'list' })
+  })
 })
 
 describe('routeHref and parseHash', () => {
@@ -43,6 +67,8 @@ describe('routeHref and parseHash', () => {
       { name: 'card', cardId: 'abc', show: false },
       { name: 'card', cardId: 'abc', show: true },
       { name: 'settings' },
+      { name: 'set-editor', setId: 'abc' },
+      { name: 'set-editor', setId: null },
     ]
     for (const route of routes) {
       expect(parseHash(routeHref(route))).toEqual(route)
