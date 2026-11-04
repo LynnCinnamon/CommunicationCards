@@ -53,10 +53,14 @@ export function App() {
     return saveDefaultDoc().then((doc) => setState({ status: 'ok', doc }), showError)
   }
 
+  const updateDoc = (doc: Doc) => {
+    //On any error, updateDoc rejects and the caller must handle the error.
+    return saveDoc(doc).then(() => setState({ status: 'ok', doc }))
+  }
+
   const importDoc = (doc: Doc) => {
-    // Later we can let the component handle this error, but for now just show it in the main area.
     // showError swallows the rejection, so ImportDoc's success message would run on failure if this ever stops being full-screen
-    return saveDoc(doc).then(() => setState({ status: 'ok', doc }), showError)
+    return updateDoc(doc).catch(showError)
   }
 
   switch (state.status) {
