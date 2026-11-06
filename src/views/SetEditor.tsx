@@ -1,5 +1,7 @@
-import type { Doc } from '../model/schema.ts'
+import { useState } from 'preact/hooks'
+import type { Card, CardSet, Doc, List } from '../model/schema.ts'
 import { routeHref } from '../router.ts'
+import { TemplateText } from './TemplateText.tsx'
 
 /** Edits one set, or creates a new one when there is no set ID. Changes are only stored via onSave. */
 export function SetEditor({
@@ -26,7 +28,7 @@ export function SetEditor({
           <a href={routeHref({ name: 'list' })}>Zur Kartenliste</a>
         </>
       ) : cardSet ? (
-        <p>Editor for set {setId}</p>
+        <SetDraft cardSet={cardSet} key={cardSet.id} cards={doc.cards} lists={doc.lists}></SetDraft>
       ) : (
         // An old link or a deleted set: offer a way out instead of an empty screen
         <>
@@ -35,5 +37,51 @@ export function SetEditor({
         </>
       )}
     </main>
+  )
+}
+
+function SetDraft({ cards, cardSet, lists }: { cards: Card[]; cardSet: CardSet; lists: List[] }) {
+  const [draft, setDraft] = useState(cardSet)
+
+  const updateCardInclusion = (cardId: string, newStatus: boolean) => {
+    if (newStatus) {
+      setDraft({ ...draft, cardIds: [...draft.cardIds, cardId] })
+      return
+    }
+    setDraft({ ...draft, cardIds: draft.cardIds.filter((id) => id !== cardId) })
+  }
+
+  return (
+    <>
+      <label>
+        Name:
+        <input
+          type="text"
+          onInput={(e) => {
+            setDraft({ ...draft, name: e.currentTarget.value })
+          }}
+          value={draft.name}
+        ></input>
+      </label>
+      <ul>
+        {cards.map((card) => {
+          const included = draft.cardIds.includes(card.id)
+          return (
+            <li key={card.id}>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={() => {
+                    updateCardInclusion(card.id, !included)
+                  }}
+                  checked={included}
+                ></input>
+                <TemplateText template={card.template} lists={lists} />
+              </label>
+            </li>
+          )
+        })}
+      </ul>
+    </>
   )
 }
