@@ -1,5 +1,5 @@
 import type { Doc } from '../model/schema.ts'
-import { routeHref } from '../router.ts'
+import { markedNavigation, routeHref } from '../router.ts'
 import { TemplateText } from './TemplateText.tsx'
 
 /** Lists all sets with their cards. Tapping a card opens it. */
@@ -39,7 +39,14 @@ export function CardListView({
         <section key={cardSet.id}>
           <div class="set-heading">
             <h2>{cardSet.name}</h2>
-            <a class="edit-link" href={routeHref({ name: 'set-editor', setId: cardSet.id })}>
+            <a
+              class="edit-link"
+              href={routeHref({ name: 'set-editor', setId: cardSet.id })}
+              onClick={(e) => {
+                e.preventDefault()
+                markedNavigation({ name: 'set-editor', setId: cardSet.id })
+              }}
+            >
               Bearbeiten
             </a>
           </div>

@@ -2,7 +2,7 @@ import type { TargetedInputEvent } from 'preact'
 import { useState } from 'preact/hooks'
 import { checkCardSet, isProblemFree, rebuildDoc, type SetProblems } from '../model/editorHelper.ts'
 import type { Card, CardSet, Doc, List } from '../model/schema.ts'
-import { routeHref } from '../router.ts'
+import { routeHref, safeBack } from '../router.ts'
 import { TemplateText } from './TemplateText.tsx'
 
 /** Edits one set, or creates a new one when there is no set ID. Changes are only stored via onSave. */
@@ -23,8 +23,8 @@ export function SetEditor({
   const cardSet = doc.sets.find((s) => s.id === setId)
   return (
     <main>
-      {/* Same as the phone's back button, so the list doesn't end up in the history twice */}
-      <button type="button" class="back-button" onClick={() => history.back()}>
+      {/* Back to the list we came from; after a direct link, to the list without leaving the app */}
+      <button type="button" class="back-button" onClick={() => safeBack({ name: 'list' })}>
         ← Zurück
       </button>
 
@@ -69,7 +69,7 @@ function SetDraft({
   const [draft, setDraft] = useState(cardSet)
   const [problems, setProblems] = useState<SetProblems>({ name: [] })
   const [saving, setSaving] = useState(false)
-  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
 
   const updateCardInclusion = (cardId: string, newStatus: boolean) => {
     if (newStatus) {
@@ -83,10 +83,10 @@ function SetDraft({
     setDraft({ ...draft, name: element.currentTarget.value })
     // Clear the name field in our problems because we changed the checked value
     setProblems({ ...problems, name: [] })
-    setMessage('')
+    setError('')
   }
   const save = () => {
-    setMessage('')
+    setError('')
     const newProblems = checkCardSet(cardSets, draft)
     setProblems(newProblems)
     if (!isProblemFree(newProblems)) {
@@ -96,10 +96,10 @@ function SetDraft({
     saveDraft(draft)
       .then(
         () => {
-          setMessage('Erfolgreich gespeichert')
+          safeBack({ name: 'list' })
         },
         (err) => {
-          setMessage(`Fehler beim Speichern: ${String(err)}`)
+          setError(`Fehler beim Speichern: ${String(err)}`)
         },
       )
       .finally(() => {
@@ -141,7 +141,7 @@ function SetDraft({
           )
         })}
       </ul>
-      <div role="status">{message}</div>
+      <div role="status">{error}</div>
       <button onClick={save} disabled={saving}>
         Speichern
       </button>
