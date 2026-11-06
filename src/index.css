@@ -77,6 +77,27 @@ h2 {
   border-color: var(--accent);
 }
 
+/* The set name and its edit link share a row, so the row takes over the h2's margins */
+.set-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.set-heading h2 {
+  margin: 0;
+}
+
+/* Padding makes a thumb-sized target; the negative margin keeps the text aligned with the cards' right edge */
+.edit-link {
+  padding: 0.85rem 1rem;
+  margin-right: -1rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+
 .card-list {
   list-style: none;
   margin: 0;
@@ -391,4 +412,50 @@ a.card-button {
   color: var(--surface);
   background: var(--accent);
   border-color: var(--accent);
+}
+
+/* Label text above its input, styled like the field legends on the card screen */
+.editor-field {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1.5rem 0 0;
+}
+
+.editor-field-label {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Laid out like the card buttons in the list, so a set's cards look the same while editing */
+.card-check {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+/* Visible on purpose: it says "pick several", unlike the single-choice buttons */
+.card-check input {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/*
+ * Only the outline turns accent, the background stays: the placeholders in the card text
+ * are already accent on accent-soft and would blend into a tinted row.
+ * The shadow thickens the border without changing the row's size
+ */
+.card-check:has(input:checked) {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
 }

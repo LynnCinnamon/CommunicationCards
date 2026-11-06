@@ -53,22 +53,25 @@ function SetDraft({ cards, cardSet, lists }: { cards: Card[]; cardSet: CardSet; 
 
   return (
     <>
-      <label>
-        Name:
+      <h1>Set bearbeiten</h1>
+      <label class="editor-field">
+        <span class="editor-field-label">Name</span>
         <input
           type="text"
+          class="field-input"
           onInput={(e) => {
             setDraft({ ...draft, name: e.currentTarget.value })
           }}
           value={draft.name}
         ></input>
       </label>
-      <ul>
+      <h2>Karten</h2>
+      <ul class="card-list">
         {cards.map((card) => {
           const included = draft.cardIds.includes(card.id)
           return (
             <li key={card.id}>
-              <label>
+              <label class="card-check">
                 <input
                   type="checkbox"
                   onChange={() => {
@@ -76,7 +79,10 @@ function SetDraft({ cards, cardSet, lists }: { cards: Card[]; cardSet: CardSet; 
                   }}
                   checked={included}
                 ></input>
-                <TemplateText template={card.template} lists={lists} />
+                {/* One flex item: TemplateText renders several nodes, which would each get the gap */}
+                <span>
+                  <TemplateText template={card.template} lists={lists} />
+                </span>
               </label>
             </li>
           )

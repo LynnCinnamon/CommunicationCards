@@ -37,8 +37,12 @@ export function CardListView({
       </div>
       {cardSet && (
         <section key={cardSet.id}>
-          <h2>{cardSet.name}</h2>
-          <a href={routeHref({ name: 'set-editor', setId: cardSet.id })}>Bearbeiten</a>
+          <div class="set-heading">
+            <h2>{cardSet.name}</h2>
+            <a class="edit-link" href={routeHref({ name: 'set-editor', setId: cardSet.id })}>
+              Bearbeiten
+            </a>
+          </div>
           <ul class="card-list">
             {cardSet.cardIds.map((cardId) => {
               const card = cardsById.get(cardId)
