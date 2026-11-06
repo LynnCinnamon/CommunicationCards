@@ -109,42 +109,58 @@ function SetDraft({
   return (
     <>
       <h1>Set bearbeiten</h1>
-      <label class="editor-field">
-        <span class="editor-field-label">Name</span>
-        <input type="text" class="field-input" onInput={nameChange} value={draft.name}></input>
-      </label>
-      <div role="status">
-        {problems.name.map((problem) => {
-          return <span key={problem}>{problem}</span>
-        })}
-      </div>
-      <h2>Karten</h2>
-      <ul class="card-list">
-        {cards.map((card) => {
-          const included = draft.cardIds.includes(card.id)
-          return (
-            <li key={card.id}>
-              <label class="card-check">
-                <input
-                  type="checkbox"
-                  onChange={() => {
-                    updateCardInclusion(card.id, !included)
-                  }}
-                  checked={included}
-                ></input>
-                {/* One flex item: TemplateText renders several nodes, which would each get the gap */}
-                <span>
-                  <TemplateText template={card.template} lists={lists} />
-                </span>
-              </label>
-            </li>
-          )
-        })}
-      </ul>
-      <div role="status">{error}</div>
-      <button onClick={save} disabled={saving}>
-        Speichern
-      </button>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          save()
+        }}
+      >
+        <label class="editor-field">
+          <span class="editor-field-label">Name</span>
+          <input
+            type="text"
+            class="field-input"
+            aria-invalid={problems.name.length > 0}
+            aria-describedby="name-problems"
+            onInput={nameChange}
+            value={draft.name}
+          ></input>
+        </label>
+        <div id="name-problems" role="status" class="error-message">
+          {problems.name.map((problem) => {
+            return <span key={problem}>{problem}</span>
+          })}
+        </div>
+        <h2>Karten</h2>
+        <ul class="card-list">
+          {cards.map((card) => {
+            const included = draft.cardIds.includes(card.id)
+            return (
+              <li key={card.id}>
+                <label class="card-check">
+                  <input
+                    type="checkbox"
+                    onChange={() => {
+                      updateCardInclusion(card.id, !included)
+                    }}
+                    checked={included}
+                  ></input>
+                  {/* One flex item: TemplateText renders several nodes, which would each get the gap */}
+                  <span>
+                    <TemplateText template={card.template} lists={lists} />
+                  </span>
+                </label>
+              </li>
+            )
+          })}
+        </ul>
+        <div role="status" class="error-message">
+          {error}
+        </div>
+        <button class="save-button" type="submit" disabled={saving}>
+          Speichern
+        </button>
+      </form>
     </>
   )
 }
