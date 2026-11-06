@@ -14,3 +14,30 @@ export function rebuildDoc(doc: Doc, cardSet: CardSet): Doc {
   )
   return { ...doc, sets: newSets }
 }
+
+/** German messages per field of the set editor, shown next to that field. Empty means the field is fine. */
+export type SetProblems = { name: string[] }
+
+/**
+ * Checks what a user can get wrong when editing a set: the name must not be empty
+ * and must differ from every other set's name, ignoring case and surrounding spaces.
+ * A set without cards is fine. IDs aren't checked here: users never see them, saveDoc does.
+ */
+export function checkCardSet(cardSets: CardSet[], draft: CardSet): SetProblems {
+  if (draft.name === '') {
+    return { name: ['Der Name darf nicht leer sein.'] }
+  }
+  const trimmed = draft.name.trim()
+  if (trimmed === '') {
+    return { name: ['Der Name darf nicht nur aus Leerzeichen bestehen.'] }
+  }
+  const lowered = trimmed.toLowerCase()
+  if (
+    cardSets.some((set) => {
+      return set.name.trim().toLowerCase() === lowered && set.id !== draft.id
+    })
+  ) {
+    return { name: [`Der Name "${trimmed}" ist schon in Verwendung.`] }
+  }
+  return { name: [] }
+}

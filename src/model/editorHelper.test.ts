@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { rebuildDoc } from './editorHelper.ts'
+import { checkCardSet, rebuildDoc } from './editorHelper.ts'
 import { exampleDoc } from './fixtures.ts'
 import type { CardSet } from './schema.ts'
 
@@ -45,5 +45,45 @@ describe('rebuildDoc', () => {
   // E.g. deleted in another tab while the editor was open; saving must not look successful
   it('throws for a set ID that is not in the doc', () => {
     expect(() => rebuildDoc(exampleDoc, { ...treffen, id: 'gibt-es-nicht' })).toThrow()
+  })
+})
+
+describe('checkCardSet', () => {
+  // The messages are for people, so only their number is tested, not the wording
+  const nameProblems = (name: string, cardIds = treffen.cardIds) =>
+    checkCardSet(exampleDoc.sets, { ...treffen, name, cardIds }).name
+
+  it('accepts a new, unique name', () => {
+    expect(nameProblems('Verabredungen')).toEqual([])
+  })
+
+  it('accepts the set keeping its own name', () => {
+    expect(nameProblems('Treffen')).toEqual([])
+  })
+
+  it('accepts the set changing only the case of its own name', () => {
+    expect(nameProblems('TREFFEN')).toEqual([])
+  })
+
+  it('rejects an empty name', () => {
+    expect(nameProblems('')).toHaveLength(1)
+  })
+
+  it('rejects a name of only spaces', () => {
+    expect(nameProblems('   ')).toHaveLength(1)
+  })
+
+  it('rejects the name of another set', () => {
+    expect(nameProblems('Smalltalk')).toHaveLength(1)
+  })
+
+  it('rejects the name of another set in different case or with spaces around it', () => {
+    expect(nameProblems('smalltalk')).toHaveLength(1)
+    expect(nameProblems('  ÖPNV ')).toHaveLength(1)
+    expect(nameProblems('öpnv')).toHaveLength(1)
+  })
+
+  it('allows a set without cards', () => {
+    expect(nameProblems('Verabredungen', [])).toEqual([])
   })
 })
