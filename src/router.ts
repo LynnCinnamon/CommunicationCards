@@ -28,6 +28,30 @@ export function routeHref(route: Route): string {
   }
 }
 
+/**
+ * Navigates to the route and marks the new history entry, which says: the entry before
+ * this one is a screen of this app. safeBack relies on that mark.
+ * For screens that are left again by code (overlay closing, editor saving), not for plain links.
+ */
+export function markedNavigation(route: Route) {
+  location.hash = routeHref(route)
+  // Replaces the state of the entry the hash change just created; the mark lives only there
+  history.replaceState({ fromApp: true }, '')
+}
+
+/**
+ * Leaves the current screen. With the mark from markedNavigation it goes back, so the
+ * screen doesn't stay in the history. Without it (reload or a direct link) going back
+ * could leave the app, so it replaces the current entry with the fallback route instead.
+ */
+export function safeBack(fallback: Route) {
+  if (history.state?.fromApp) {
+    history.back()
+    return
+  }
+  location.replace(routeHref(fallback))
+}
+
 export function parseHash(hash: string): Route {
   const cardMatch = /^#\/card\/([A-Za-z0-9_-]+)(\/show)?$/.exec(hash)
   const setEditorMatch = /^#\/editor\/set(?:\/([A-Za-z0-9_-]+))?$/.exec(hash)
