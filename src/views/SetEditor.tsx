@@ -1,4 +1,6 @@
+import type { TargetedInputEvent } from 'preact'
 import { useState } from 'preact/hooks'
+import { checkCardSet, isProblemFree, rebuildDoc, type SetProblems } from '../model/editorHelper.ts'
 import type { Card, CardSet, Doc, List } from '../model/schema.ts'
 import { routeHref } from '../router.ts'
 import { TemplateText } from './TemplateText.tsx'
@@ -13,8 +15,12 @@ export function SetEditor({
   setId: string | null
   onSave: (doc: Doc) => Promise<void>
 }) {
+  const saveDraft = async (draft: CardSet): Promise<void> => {
+    const newDoc = rebuildDoc(doc, draft)
+    return onSave(newDoc)
+  }
+
   const cardSet = doc.sets.find((s) => s.id === setId)
-  void onSave // Used once saving exists
   return (
     <main>
       {/* Same as the phone's back button, so the list doesn't end up in the history twice */}
@@ -28,7 +34,14 @@ export function SetEditor({
           <a href={routeHref({ name: 'list' })}>Zur Kartenliste</a>
         </>
       ) : cardSet ? (
-        <SetDraft cardSet={cardSet} key={cardSet.id} cards={doc.cards} lists={doc.lists}></SetDraft>
+        <SetDraft
+          cardSet={cardSet}
+          key={cardSet.id}
+          cards={doc.cards}
+          lists={doc.lists}
+          cardSets={doc.sets}
+          saveDraft={saveDraft}
+        ></SetDraft>
       ) : (
         // An old link or a deleted set: offer a way out instead of an empty screen
         <>
@@ -40,8 +53,23 @@ export function SetEditor({
   )
 }
 
-function SetDraft({ cards, cardSet, lists }: { cards: Card[]; cardSet: CardSet; lists: List[] }) {
+function SetDraft({
+  cards,
+  cardSet,
+  lists,
+  cardSets,
+  saveDraft,
+}: {
+  cards: Card[]
+  cardSet: CardSet
+  lists: List[]
+  cardSets: CardSet[]
+  saveDraft: (draft: CardSet) => Promise<void>
+}) {
   const [draft, setDraft] = useState(cardSet)
+  const [problems, setProblems] = useState<SetProblems>({ name: [] })
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState('')
 
   const updateCardInclusion = (cardId: string, newStatus: boolean) => {
     if (newStatus) {
@@ -51,20 +79,45 @@ function SetDraft({ cards, cardSet, lists }: { cards: Card[]; cardSet: CardSet; 
     setDraft({ ...draft, cardIds: draft.cardIds.filter((id) => id !== cardId) })
   }
 
+  const nameChange = (element: TargetedInputEvent<HTMLInputElement>) => {
+    setDraft({ ...draft, name: element.currentTarget.value })
+    // Clear the name field in our problems because we changed the checked value
+    setProblems({ ...problems, name: [] })
+    setMessage('')
+  }
+  const save = () => {
+    setMessage('')
+    const newProblems = checkCardSet(cardSets, draft)
+    setProblems(newProblems)
+    if (!isProblemFree(newProblems)) {
+      return // Early return to block saving. We already have extracted the problems.
+    }
+    setSaving(true)
+    saveDraft(draft)
+      .then(
+        () => {
+          setMessage('Erfolgreich gespeichert')
+        },
+        (err) => {
+          setMessage(`Fehler beim Speichern: ${String(err)}`)
+        },
+      )
+      .finally(() => {
+        setSaving(false)
+      })
+  }
   return (
     <>
       <h1>Set bearbeiten</h1>
       <label class="editor-field">
         <span class="editor-field-label">Name</span>
-        <input
-          type="text"
-          class="field-input"
-          onInput={(e) => {
-            setDraft({ ...draft, name: e.currentTarget.value })
-          }}
-          value={draft.name}
-        ></input>
+        <input type="text" class="field-input" onInput={nameChange} value={draft.name}></input>
       </label>
+      <div role="status">
+        {problems.name.map((problem) => {
+          return <span key={problem}>{problem}</span>
+        })}
+      </div>
       <h2>Karten</h2>
       <ul class="card-list">
         {cards.map((card) => {
@@ -88,6 +141,10 @@ function SetDraft({ cards, cardSet, lists }: { cards: Card[]; cardSet: CardSet; 
           )
         })}
       </ul>
+      <div role="status">{message}</div>
+      <button onClick={save} disabled={saving}>
+        Speichern
+      </button>
     </>
   )
 }

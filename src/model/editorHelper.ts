@@ -16,7 +16,7 @@ export function rebuildDoc(doc: Doc, cardSet: CardSet): Doc {
 }
 
 /** German messages per field of the set editor, shown next to that field. Empty means the field is fine. */
-export type SetProblems = { name: string[] }
+export type SetProblems = Record<'name', string[]>
 
 /**
  * Checks what a user can get wrong when editing a set: the name must not be empty
@@ -40,4 +40,9 @@ export function checkCardSet(cardSets: CardSet[], draft: CardSet): SetProblems {
     return { name: [`Der Name "${trimmed}" ist schon in Verwendung.`] }
   }
   return { name: [] }
+}
+
+/** True when no field has a message. Walks all fields, so new ones in SetProblems are covered without changes here. */
+export function isProblemFree(problems: SetProblems): boolean {
+  return !Object.values(problems).some((problemList) => problemList.length > 0)
 }

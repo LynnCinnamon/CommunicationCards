@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkCardSet, rebuildDoc } from './editorHelper.ts'
+import { checkCardSet, isProblemFree, rebuildDoc } from './editorHelper.ts'
 import { exampleDoc } from './fixtures.ts'
 import type { CardSet } from './schema.ts'
 
@@ -85,5 +85,20 @@ describe('checkCardSet', () => {
 
   it('allows a set without cards', () => {
     expect(nameProblems('Verabredungen', [])).toEqual([])
+  })
+})
+
+describe('isProblemFree', () => {
+  it('is true when no field has a message', () => {
+    expect(isProblemFree({ name: [] })).toBe(true)
+  })
+
+  it('is false when a field has a message', () => {
+    expect(isProblemFree({ name: ['Der Name darf nicht leer sein.'] })).toBe(false)
+  })
+
+  it('agrees with checkCardSet', () => {
+    expect(isProblemFree(checkCardSet(exampleDoc.sets, treffen))).toBe(true)
+    expect(isProblemFree(checkCardSet(exampleDoc.sets, { ...treffen, name: '' }))).toBe(false)
   })
 })
