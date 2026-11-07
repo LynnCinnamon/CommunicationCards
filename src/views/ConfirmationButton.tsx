@@ -47,7 +47,8 @@ export function ConfirmationButton({
     setConfirming(true)
   }
   return (
-    <>
+    // Its own grid, so the buttons are full width and evenly spaced wherever it's placed
+    <div class="confirmation">
       {confirming ? (
         <>
           <p id={id}>{explanation}</p>
@@ -74,6 +75,6 @@ export function ConfirmationButton({
           {actionLabel}
         </button>
       )}
-    </>
+    </div>
   )
 }

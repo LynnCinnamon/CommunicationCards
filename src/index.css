@@ -507,3 +507,13 @@ a.card-button {
   opacity: 0.6;
   cursor: default;
 }
+
+/* Grid items stretch, so every button inside is full width; same spacing as .action-list */
+.confirmation {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.confirmation p {
+  margin: 0;
+}
