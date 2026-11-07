@@ -1,5 +1,5 @@
 import type { Doc } from '../model/schema.ts'
-import { routeHref } from '../router.ts'
+import { markedNavigation, routeHref } from '../router.ts'
 import { TemplateText } from './TemplateText.tsx'
 
 /** Lists all sets with their cards. Tapping a card opens it. */
@@ -34,10 +34,33 @@ export function CardListView({
             </button>
           )
         })}
+        <a
+          href={routeHref({ name: 'set-editor', setId: null })}
+          aria-label="Neues Set"
+          class="set-tab"
+          onClick={(e) => {
+            e.preventDefault()
+            markedNavigation({ name: 'set-editor', setId: null })
+          }}
+        >
+          +
+        </a>
       </div>
       {cardSet && (
         <section key={cardSet.id}>
-          <h2>{cardSet.name}</h2>
+          <div class="set-heading">
+            <h2>{cardSet.name}</h2>
+            <a
+              class="edit-link"
+              href={routeHref({ name: 'set-editor', setId: cardSet.id })}
+              onClick={(e) => {
+                e.preventDefault()
+                markedNavigation({ name: 'set-editor', setId: cardSet.id })
+              }}
+            >
+              Bearbeiten
+            </a>
+          </div>
           <ul class="card-list">
             {cardSet.cardIds.map((cardId) => {
               const card = cardsById.get(cardId)

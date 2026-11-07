@@ -1,7 +1,7 @@
-import { useState } from 'preact/hooks'
 import type { Doc } from '../model/schema.ts'
 import { getDateString } from '../storage/dateFuncs.ts'
 import { downloadJson } from '../storage/downloadJson.ts'
+import { ConfirmationButton } from './ConfirmationButton.tsx'
 import { ImportDoc } from './ImportDoc.tsx'
 
 type Props = {
@@ -16,9 +16,6 @@ type Props = {
  * here except explicit reset or import, so the broken data survives until the user decides.
  */
 export function InvalidDataView({ problems, raw, onReset, onImport }: Props) {
-  // Reset deletes the stored data, so it needs a second tap
-  const [confirmingReset, setConfirmingReset] = useState(false)
-
   const exportRaw = () => {
     const date = getDateString()
     downloadJson(raw, `communication-cards-defekt-${date}.json`)
@@ -39,22 +36,14 @@ export function InvalidDataView({ problems, raw, onReset, onImport }: Props) {
           Daten exportieren
         </button>
         <ImportDoc onImport={onImport} />
-
-        {confirmingReset ? (
-          <>
-            <p>Alle gespeicherten Karten werden durch die Beispielkarten ersetzt.</p>
-            <button class="action-button" onClick={onReset}>
-              Ja, zurücksetzen
-            </button>
-            <button class="action-button" onClick={() => setConfirmingReset(false)}>
-              Abbrechen
-            </button>
-          </>
-        ) : (
-          <button class="action-button" onClick={() => setConfirmingReset(true)}>
-            Auf Beispielkarten zurücksetzen
-          </button>
-        )}
+        {/* Reset deletes the stored data, so it asks first */}
+        <ConfirmationButton
+          actionLabel="Auf Beispielkarten zurücksetzen"
+          confirmationLabel="Ja, zurücksetzen"
+          explanation="Alle gespeicherten Karten werden durch die Beispielkarten ersetzt."
+          buttonClass="action-button"
+          onConfirm={onReset}
+        ></ConfirmationButton>
       </div>
     </main>
   )

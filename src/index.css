@@ -9,6 +9,7 @@
   --border: light-dark(#d4d4d8, #3f3f46);
   --accent: light-dark(#1d4ed8, #93c5fd);
   --accent-soft: light-dark(#dbeafe, #1e3a5f);
+  --danger: light-dark(#b91c1c, #fca5a5);
 }
 
 /* Sizes include padding and border, so `width: 100%` never overflows its container */
@@ -69,12 +70,44 @@ h2 {
   background: var(--accent-soft);
 }
 
+/*
+ * The "+" tab is a link (it navigates), so it needs what buttons do on their own:
+ * centered content and no underline. Dashed, because it creates a set instead of showing one
+ */
+a.set-tab {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  border-style: dashed;
+}
+
 /* Selected looks like a selected choice button, so "solid = chosen" means the same everywhere */
 .set-tab[aria-pressed='true'] {
   font-weight: 600;
   color: var(--surface);
   background: var(--accent);
   border-color: var(--accent);
+}
+
+/* The set name and its edit link share a row, so the row takes over the h2's margins */
+.set-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.set-heading h2 {
+  margin: 0;
+}
+
+/* Padding makes a thumb-sized target; the negative margin keeps the text aligned with the cards' right edge */
+.edit-link {
+  padding: 0.85rem 1rem;
+  margin-right: -1rem;
+  color: var(--accent);
+  text-decoration: none;
 }
 
 .card-list {
@@ -391,4 +424,124 @@ a.card-button {
   color: var(--surface);
   background: var(--accent);
   border-color: var(--accent);
+}
+
+/* Label text above its input, styled like the field legends on the card screen */
+.editor-field {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1.5rem 0 0;
+}
+
+.editor-field-label {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Laid out like the card buttons in the list, so a set's cards look the same while editing */
+.card-check {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+/* Visible on purpose: it says "pick several", unlike the single-choice buttons */
+.card-check input {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/*
+ * Only the outline turns accent, the background stays: the placeholders in the card text
+ * are already accent on accent-soft and would blend into a tinted row.
+ * The shadow thickens the border without changing the row's size
+ */
+.card-check:has(input:checked) {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/*
+ * Keyed to aria-invalid instead of a class: the attribute also tells screen readers
+ * the field is wrong, so look and meaning can't drift apart. Same ring trick as .card-check
+ */
+.field-input[aria-invalid='true'] {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 1px var(--danger);
+}
+
+.error-message {
+  margin: 0.5rem 0 0;
+  font-weight: 600;
+  color: var(--danger);
+}
+
+/* The editor's main action, so it looks like the "Zeigen" link on the card screen */
+.save-button {
+  width: 100%;
+  min-height: 3.5rem;
+  margin-top: 1.5rem;
+  padding: 0 1rem;
+  font: inherit;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--surface);
+  background: var(--accent);
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+.save-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/*
+ * Outlined, not solid: it sits right under the solid "Speichern" and must not compete
+ * with it as the main action. Red says it destroys something
+ */
+.delete-button {
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0 1rem;
+  font: inherit;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--danger);
+  background: none;
+  border: 1px solid var(--danger);
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+.delete-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Grid items stretch, so every button inside is full width; same spacing as .action-list */
+.confirmation {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.confirmation p {
+  margin: 0;
+}
+
+/* In the set editor the delete question follows "Speichern" directly */
+.save-button + .confirmation {
+  margin-top: 0.75rem;
 }

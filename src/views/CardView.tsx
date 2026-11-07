@@ -3,7 +3,7 @@ import { useEffect, useId, useState } from 'preact/hooks'
 import { formatDateTime } from '../model/dateTimeField.ts'
 import { initialNumber } from '../model/numberField.ts'
 import type { Card, Doc, Field, List } from '../model/schema.ts'
-import { routeHref } from '../router.ts'
+import { markedNavigation, routeHref, safeBack } from '../router.ts'
 import { ChoiceButtons } from './fields/ChoiceButtons.tsx'
 import { ChoicePicker } from './fields/ChoicePicker.tsx'
 import { DateTimePicker } from './fields/DateTimePicker.tsx'
@@ -58,13 +58,7 @@ function CardForm({ card, lists, show }: { card: Card; lists: List[]; show: bool
   // so return to the form instead of showing an empty sentence.
   useEffect(() => {
     if (show) {
-      // Opened via "Zeigen": the form's entry is right before this one, so going back
-      // avoids leaving it in the history twice. Without the mark there may be no such entry.
-      if (history.state?.fromCard) {
-        history.back()
-        return
-      }
-      location.replace(routeHref({ name: 'card', cardId: card.id, show: false }))
+      safeBack({ name: 'card', cardId: card.id, show: false })
     }
     // Only the value at mount matters; later changes of show are the overlay opening and closing
     // oxlint-disable-next-line react/exhaustive-deps
@@ -108,8 +102,7 @@ function CardForm({ card, lists, show }: { card: Card; lists: List[]; show: bool
 
   const markNavigation = (e: MouseEvent) => {
     e.preventDefault()
-    location.hash = routeHref({ name: 'card', cardId: card.id, show: true })
-    history.replaceState({ fromCard: true }, '')
+    markedNavigation({ name: 'card', cardId: card.id, show: true })
   }
 
   return (

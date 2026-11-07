@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks'
 import type { Doc } from '../model/schema.ts'
 import { getDateString } from '../storage/dateFuncs.ts'
 import { downloadJson } from '../storage/downloadJson.ts'
+import { ConfirmationButton } from './ConfirmationButton.tsx'
 import { ImportDoc } from './ImportDoc.tsx'
 
 /** Settings screen, reset and import buttons and export option. */
@@ -14,18 +15,15 @@ export function SettingsView({
   onReset: () => Promise<void>
   onImport: (doc: Doc) => Promise<void>
 }) {
-  const [confirmingReset, setConfirmingReset] = useState(false)
   const [showResetMessage, setShowResetMessage] = useState(false)
 
   const onResetClick = () => {
     onReset().then(() => {
-      setConfirmingReset(false)
       setShowResetMessage(true)
     })
   }
 
   const clickConfirmReset = () => {
-    setConfirmingReset(true)
     setShowResetMessage(false)
   }
 
@@ -45,22 +43,14 @@ export function SettingsView({
           Karten exportieren
         </button>
         <ImportDoc onImport={onImport} />
-        {confirmingReset ? (
-          <>
-            <p>Alle gespeicherten Karten werden durch die Beispielkarten ersetzt.</p>
-            <button type="button" class="action-button" onClick={onResetClick}>
-              Ja, zurücksetzen
-            </button>
-            <button type="button" class="action-button" onClick={() => setConfirmingReset(false)}>
-              Abbrechen
-            </button>
-          </>
-        ) : (
-          <button type="button" class="action-button" onClick={clickConfirmReset}>
-            Auf Beispielkarten zurücksetzen
-          </button>
-        )}
-
+        <ConfirmationButton
+          actionLabel="Auf Beispielkarten zurücksetzen"
+          confirmationLabel="Ja, zurücksetzen"
+          explanation="Alle gespeicherten Karten werden durch die Beispielkarten ersetzt."
+          buttonClass="action-button"
+          onConfirm={onResetClick}
+          onConfirmOpen={clickConfirmReset}
+        ></ConfirmationButton>
         {/* Always rendered: screen readers only announce changes to a live region that already exists */}
         <p role="status">{showResetMessage && 'Die Karten wurden zurückgesetzt.'}</p>
       </section>
