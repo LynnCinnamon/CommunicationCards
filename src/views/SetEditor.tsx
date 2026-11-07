@@ -4,12 +4,14 @@ import {
   addSet,
   checkCardSet,
   isProblemFree,
+  removeSet,
   replaceSet,
   type SetProblems,
 } from '../model/editorHelper.ts'
 import { generateUniqueId } from '../model/idHelper.ts'
 import type { Card, CardSet, Doc, List } from '../model/schema.ts'
 import { routeHref, safeBack } from '../router.ts'
+import { ConfirmationButton } from './ConfirmationButton.tsx'
 import { TemplateText } from './TemplateText.tsx'
 
 /** Edits one set, or creates a new one when there is no set ID. Changes are only stored via onSave. */
@@ -31,6 +33,12 @@ export function SetEditor({
     const id = generateUniqueId(new Set(doc.sets.map((set) => set.id)))
     const newSet = { ...draft, id }
     const newDoc = addSet(doc, newSet)
+    return onSave(newDoc)
+  }
+
+  const deleteSet = async (): Promise<void> => {
+    if (setId === null) throw new Error('Trying to delete a null set.')
+    const newDoc = removeSet(doc, setId)
     return onSave(newDoc)
   }
 
@@ -64,6 +72,7 @@ export function SetEditor({
             lists={doc.lists}
             cardSets={doc.sets}
             saveDraft={saveDraft}
+            deleteSet={deleteSet}
           ></SetDraft>
         </>
       ) : (
@@ -83,17 +92,38 @@ function SetDraft({
   lists,
   cardSets,
   saveDraft,
+  deleteSet,
 }: {
   cards: Card[]
   cardSet: CardSet
   lists: List[]
   cardSets: CardSet[]
   saveDraft: (draft: CardSet) => Promise<void>
+  deleteSet?: () => Promise<void>
 }) {
   const [draft, setDraft] = useState(cardSet)
   const [problems, setProblems] = useState<SetProblems>({ name: [] })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  const onDelete = () => {
+    if (deleteSet === undefined)
+      throw new Error('Cannot delete set, no deleteSet function defined.')
+    setSaving(true)
+    setError('')
+    deleteSet()
+      .then(
+        () => {
+          safeBack({ name: 'list' })
+        },
+        (err) => {
+          setError(`Fehler beim Löschen: ${String(err)}`)
+        },
+      )
+      .finally(() => {
+        setSaving(false)
+      })
+  }
 
   const updateCardInclusion = (cardId: string, newStatus: boolean) => {
     if (newStatus) {
@@ -183,6 +213,15 @@ function SetDraft({
         <button class="save-button" type="submit" disabled={saving}>
           Speichern
         </button>
+        {deleteSet !== undefined && (
+          <ConfirmationButton
+            actionLabel="Löschen"
+            confirmationLabel="Ja, löschen"
+            explanation="Dieses Set wird unwiderruflich gelöscht. Die Karten bleiben erhalten."
+            buttonClass="delete-button"
+            onConfirm={onDelete}
+          ></ConfirmationButton>
+        )}
       </form>
     </>
   )

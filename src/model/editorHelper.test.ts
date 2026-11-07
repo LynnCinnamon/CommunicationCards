@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { addSet, checkCardSet, isProblemFree, replaceSet } from './editorHelper.ts'
+import { addSet, checkCardSet, isProblemFree, removeSet, replaceSet } from './editorHelper.ts'
 import { exampleDoc } from './fixtures.ts'
-import type { CardSet } from './schema.ts'
+import type { CardSet, Doc } from './schema.ts'
 
 const treffen: CardSet = {
   id: 'treffen',
@@ -89,6 +89,38 @@ describe('addSet', () => {
   // Adding must never overwrite a set that is already there
   it('throws for a set ID that is already in the doc', () => {
     expect(() => addSet(exampleDoc, { ...ausflug, id: 'treffen' })).toThrow()
+  })
+})
+
+describe('removeSet', () => {
+  // The only place that says how removeSet is called, so a signature change touches one line
+  const remove = (doc: Doc, setId: string) => removeSet(doc, setId)
+
+  it('removes the set with that ID and keeps the order of the others', () => {
+    const doc = remove(exampleDoc, 'smalltalk')
+    expect(doc.sets.map((set) => set.id)).toEqual(['oepnv', 'treffen'])
+  })
+
+  it('keeps the cards of the removed set and the lists', () => {
+    const doc = remove(exampleDoc, 'treffen')
+    expect(doc.cards).toEqual(exampleDoc.cards)
+    expect(doc.lists).toEqual(exampleDoc.lists)
+  })
+
+  it('does not change the doc it was given', () => {
+    const docBefore = structuredClone(exampleDoc)
+    remove(exampleDoc, 'treffen')
+    expect(exampleDoc).toEqual(docBefore)
+  })
+
+  it('can remove the last remaining set', () => {
+    let doc = exampleDoc
+    for (const set of exampleDoc.sets) doc = remove(doc, set.id)
+    expect(doc.sets).toEqual([])
+  })
+
+  it('throws for a set ID that is not in the doc', () => {
+    expect(() => remove(exampleDoc, 'gibt-es-nicht')).toThrow()
   })
 })
 

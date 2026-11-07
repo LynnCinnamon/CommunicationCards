@@ -508,6 +508,29 @@ a.card-button {
   cursor: default;
 }
 
+/*
+ * Outlined, not solid: it sits right under the solid "Speichern" and must not compete
+ * with it as the main action. Red says it destroys something
+ */
+.delete-button {
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0 1rem;
+  font: inherit;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--danger);
+  background: none;
+  border: 1px solid var(--danger);
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+.delete-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 /* Grid items stretch, so every button inside is full width; same spacing as .action-list */
 .confirmation {
   display: grid;
@@ -516,4 +539,9 @@ a.card-button {
 
 .confirmation p {
   margin: 0;
+}
+
+/* In the set editor the delete question follows "Speichern" directly */
+.save-button + .confirmation {
+  margin-top: 0.75rem;
 }

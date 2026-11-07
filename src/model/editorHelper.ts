@@ -27,6 +27,19 @@ export function addSet(doc: Doc, cardSet: CardSet): Doc {
   return { ...doc, sets: [...doc.sets, { ...cardSet, name: cardSet.name.trim() }] }
 }
 
+/**
+ * A new doc without the set of that ID. Only the set goes: its cards stay in the doc,
+ * other sets may still use them. Throws if the doc has no set with that ID.
+ * Never changes its inputs; the remaining sets are shared with the old doc.
+ */
+export function removeSet(doc: Doc, id: string): Doc {
+  if (!doc.sets.some((set) => set.id === id)) {
+    throw new Error(`Trying to remove an unknown set ${id}.`)
+  }
+  const newSets = doc.sets.filter((set) => set.id !== id)
+  return { ...doc, sets: newSets }
+}
+
 /** German messages per field of the set editor, shown next to that field. Empty means the field is fine. */
 export type SetProblems = Record<'name', string[]>
 
