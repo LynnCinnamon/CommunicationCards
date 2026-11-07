@@ -5,7 +5,7 @@ import type { CardSet, Doc } from './schema.ts'
  * Throws if the doc has no set with that ID, so a save can't silently change nothing.
  * Never changes its inputs; the untouched sets are shared with the old doc.
  */
-export function rebuildDoc(doc: Doc, cardSet: CardSet): Doc {
+export function replaceSet(doc: Doc, cardSet: CardSet): Doc {
   if (!doc.sets.some((set) => set.id === cardSet.id)) {
     throw new Error(`Trying to update an unknown set ${cardSet.id}.`)
   }
@@ -13,6 +13,18 @@ export function rebuildDoc(doc: Doc, cardSet: CardSet): Doc {
     set.id === cardSet.id ? { ...cardSet, name: cardSet.name.trim() } : set,
   )
   return { ...doc, sets: newSets }
+}
+
+/**
+ * A new doc with this set appended after the existing ones, its name trimmed.
+ * Throws if a set with that ID already exists, so adding can never overwrite one.
+ * Never changes its inputs; the existing sets are shared with the old doc.
+ */
+export function addSet(doc: Doc, cardSet: CardSet): Doc {
+  if (doc.sets.some((set) => set.id === cardSet.id)) {
+    throw new Error(`Trying to add an already known set ${cardSet.id}.`)
+  }
+  return { ...doc, sets: [...doc.sets, { ...cardSet, name: cardSet.name.trim() }] }
 }
 
 /** German messages per field of the set editor, shown next to that field. Empty means the field is fine. */

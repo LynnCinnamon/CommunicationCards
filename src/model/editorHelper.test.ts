@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { checkCardSet, isProblemFree, rebuildDoc } from './editorHelper.ts'
+import { addSet, checkCardSet, isProblemFree, replaceSet } from './editorHelper.ts'
 import { exampleDoc } from './fixtures.ts'
 import type { CardSet } from './schema.ts'
 
@@ -9,19 +9,19 @@ const treffen: CardSet = {
   cardIds: ['treffen-date', 'vorstellung'],
 }
 
-describe('rebuildDoc', () => {
+describe('replaceSet', () => {
   it('replaces the set with the same ID', () => {
-    const doc = rebuildDoc(exampleDoc, treffen)
+    const doc = replaceSet(exampleDoc, treffen)
     expect(doc.sets.find((set) => set.id === 'treffen')).toEqual(treffen)
   })
 
   it('keeps the set at its position', () => {
-    const doc = rebuildDoc(exampleDoc, treffen)
+    const doc = replaceSet(exampleDoc, treffen)
     expect(doc.sets.map((set) => set.id)).toEqual(['oepnv', 'smalltalk', 'treffen'])
   })
 
   it('leaves the other sets, cards and lists as they are', () => {
-    const doc = rebuildDoc(exampleDoc, treffen)
+    const doc = replaceSet(exampleDoc, treffen)
     expect(doc.sets.filter((set) => set.id !== 'treffen')).toEqual(
       exampleDoc.sets.filter((set) => set.id !== 'treffen'),
     )
@@ -32,19 +32,63 @@ describe('rebuildDoc', () => {
   it('does not change the doc or the set it was given', () => {
     const docBefore = structuredClone(exampleDoc)
     const setBefore = structuredClone(treffen)
-    rebuildDoc(exampleDoc, treffen)
+    replaceSet(exampleDoc, treffen)
     expect(exampleDoc).toEqual(docBefore)
     expect(treffen).toEqual(setBefore)
   })
 
   it('trims spaces around the name', () => {
-    const doc = rebuildDoc(exampleDoc, { ...treffen, name: '  Verabredungen ' })
+    const doc = replaceSet(exampleDoc, { ...treffen, name: '  Verabredungen ' })
     expect(doc.sets.find((set) => set.id === 'treffen')?.name).toBe('Verabredungen')
   })
 
   // E.g. deleted in another tab while the editor was open; saving must not look successful
   it('throws for a set ID that is not in the doc', () => {
-    expect(() => rebuildDoc(exampleDoc, { ...treffen, id: 'gibt-es-nicht' })).toThrow()
+    expect(() => replaceSet(exampleDoc, { ...treffen, id: 'gibt-es-nicht' })).toThrow()
+  })
+})
+
+describe('addSet', () => {
+  const ausflug: CardSet = {
+    id: 'ausflug',
+    name: 'Ausflug',
+    cardIds: ['aussteigen'],
+  }
+
+  it('appends the set after the existing ones', () => {
+    const doc = addSet(exampleDoc, ausflug)
+    expect(doc.sets.map((set) => set.id)).toEqual(['oepnv', 'smalltalk', 'treffen', 'ausflug'])
+    expect(doc.sets.at(-1)).toEqual(ausflug)
+  })
+
+  it('leaves the existing sets, cards and lists as they are', () => {
+    const doc = addSet(exampleDoc, ausflug)
+    expect(doc.sets.slice(0, -1)).toEqual(exampleDoc.sets)
+    expect(doc.cards).toEqual(exampleDoc.cards)
+    expect(doc.lists).toEqual(exampleDoc.lists)
+  })
+
+  it('does not change the doc or the set it was given', () => {
+    const docBefore = structuredClone(exampleDoc)
+    const setBefore = structuredClone(ausflug)
+    addSet(exampleDoc, ausflug)
+    expect(exampleDoc).toEqual(docBefore)
+    expect(ausflug).toEqual(setBefore)
+  })
+
+  it('trims spaces around the name', () => {
+    const doc = addSet(exampleDoc, { ...ausflug, name: ' Ausflug  ' })
+    expect(doc.sets.at(-1)?.name).toBe('Ausflug')
+  })
+
+  it('allows a set without cards', () => {
+    const doc = addSet(exampleDoc, { ...ausflug, cardIds: [] })
+    expect(doc.sets.at(-1)?.cardIds).toEqual([])
+  })
+
+  // Adding must never overwrite a set that is already there
+  it('throws for a set ID that is already in the doc', () => {
+    expect(() => addSet(exampleDoc, { ...ausflug, id: 'treffen' })).toThrow()
   })
 })
 

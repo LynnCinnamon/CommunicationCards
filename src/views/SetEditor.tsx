@@ -1,6 +1,6 @@
 import type { TargetedInputEvent } from 'preact'
 import { useState } from 'preact/hooks'
-import { checkCardSet, isProblemFree, rebuildDoc, type SetProblems } from '../model/editorHelper.ts'
+import { checkCardSet, isProblemFree, replaceSet, type SetProblems } from '../model/editorHelper.ts'
 import type { Card, CardSet, Doc, List } from '../model/schema.ts'
 import { routeHref, safeBack } from '../router.ts'
 import { TemplateText } from './TemplateText.tsx'
@@ -16,7 +16,7 @@ export function SetEditor({
   onSave: (doc: Doc) => Promise<void>
 }) {
   const saveDraft = async (draft: CardSet): Promise<void> => {
-    const newDoc = rebuildDoc(doc, draft)
+    const newDoc = replaceSet(doc, draft)
     return onSave(newDoc)
   }
 
