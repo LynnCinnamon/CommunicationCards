@@ -34,6 +34,17 @@ export function CardListView({
             </button>
           )
         })}
+        <a
+          href={routeHref({ name: 'set-editor', setId: null })}
+          aria-label="Neues Set"
+          class="set-tab"
+          onClick={(e) => {
+            e.preventDefault()
+            markedNavigation({ name: 'set-editor', setId: null })
+          }}
+        >
+          +
+        </a>
       </div>
       {cardSet && (
         <section key={cardSet.id}>

@@ -1,6 +1,13 @@
 import type { TargetedInputEvent } from 'preact'
 import { useState } from 'preact/hooks'
-import { checkCardSet, isProblemFree, replaceSet, type SetProblems } from '../model/editorHelper.ts'
+import {
+  addSet,
+  checkCardSet,
+  isProblemFree,
+  replaceSet,
+  type SetProblems,
+} from '../model/editorHelper.ts'
+import { generateUniqueId } from '../model/idHelper.ts'
 import type { Card, CardSet, Doc, List } from '../model/schema.ts'
 import { routeHref, safeBack } from '../router.ts'
 import { TemplateText } from './TemplateText.tsx'
@@ -20,6 +27,13 @@ export function SetEditor({
     return onSave(newDoc)
   }
 
+  const saveNewDraft = async (draft: CardSet): Promise<void> => {
+    const id = generateUniqueId(new Set(doc.sets.map((set) => set.id)))
+    const newSet = { ...draft, id }
+    const newDoc = addSet(doc, newSet)
+    return onSave(newDoc)
+  }
+
   const cardSet = doc.sets.find((s) => s.id === setId)
   return (
     <main>
@@ -30,18 +44,28 @@ export function SetEditor({
 
       {setId === null ? (
         <>
-          <p>Neues Set Editor placeholder.</p>
-          <a href={routeHref({ name: 'list' })}>Zur Kartenliste</a>
+          <h1>Set erstellen</h1>
+          <SetDraft
+            cardSet={{ id: '', name: '', cardIds: [] }} // id='' can never clash with existing sets
+            key={''}
+            cards={doc.cards}
+            lists={doc.lists}
+            cardSets={doc.sets}
+            saveDraft={saveNewDraft}
+          ></SetDraft>
         </>
       ) : cardSet ? (
-        <SetDraft
-          cardSet={cardSet}
-          key={cardSet.id}
-          cards={doc.cards}
-          lists={doc.lists}
-          cardSets={doc.sets}
-          saveDraft={saveDraft}
-        ></SetDraft>
+        <>
+          <h1>Set bearbeiten</h1>
+          <SetDraft
+            cardSet={cardSet}
+            key={cardSet.id}
+            cards={doc.cards}
+            lists={doc.lists}
+            cardSets={doc.sets}
+            saveDraft={saveDraft}
+          ></SetDraft>
+        </>
       ) : (
         // An old link or a deleted set: offer a way out instead of an empty screen
         <>
@@ -108,7 +132,6 @@ function SetDraft({
   }
   return (
     <>
-      <h1>Set bearbeiten</h1>
       <form
         onSubmit={(e) => {
           e.preventDefault()

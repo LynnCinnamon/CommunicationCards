@@ -70,6 +70,17 @@ h2 {
   background: var(--accent-soft);
 }
 
+/*
+ * The "+" tab is a link (it navigates), so it needs what buttons do on their own:
+ * centered content and no underline. Dashed, because it creates a set instead of showing one
+ */
+a.set-tab {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  border-style: dashed;
+}
+
 /* Selected looks like a selected choice button, so "solid = chosen" means the same everywhere */
 .set-tab[aria-pressed='true'] {
   font-weight: 600;
